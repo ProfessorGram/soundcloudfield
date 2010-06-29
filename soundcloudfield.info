@@ -1,0 +1,6 @@
+; $Id$
+name = Soundcloud field
+description = Soundcloud CCK field
+dependencies[] = content
+package = Soundcloud
+core = 6.x
