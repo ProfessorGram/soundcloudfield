@@ -1,5 +1,5 @@
 name = Soundcloud field
-description = Soundcloud CCK field
-dependencies[] = content
-package = Soundcloud
-core = 6.x
+description = Field for Soundcloud tracks and sets.
+core = 7.x
+dependencies[] = field
+package = Fields
