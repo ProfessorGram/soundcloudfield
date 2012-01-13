@@ -10,8 +10,8 @@ define('SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT', 305);
 function soundcloudfield_field_info() {
   return array(
     'soundcloud' => array(
-      'label'             => t('Soundcloud'),
-      'description'       => t('This field stores a Soundcloud track or set URL.'),
+      'label' => t('SoundCloud'),
+      'description' => t('This field stores a SoundCloud track or set URL.'),
       'instance_settings' => array(
         'width'         => SOUNDCLOUDFIELD_DEFAULT_WIDTH,
         'height'        => SOUNDCLOUDFIELD_DEFAULT_HEIGHT,
@@ -20,7 +20,7 @@ function soundcloudfield_field_info() {
         'showcomments'  => FALSE,
         'showplaycount' => FALSE,
         'showartwork'   => FALSE,
-        'color'         => '#000000',
+        'color'         => 'ff7700',
       ),
       'default_widget'    => 'soundcloud_url',
       'default_formatter' => 'soundcloud_default',
@@ -54,7 +54,7 @@ function soundcloudfield_field_validate($obj_type, $object, $field, $instance, $
       if (!empty($item['url']) && !preg_match('@^http://soundcloud\.com/([^"\&]+)@i', $item['url'], $matches)) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error'   => 'soundcloudfield_invalid_url',
-          'message' => t('%url is not a valid Soundcloud url.', array('%url' => $item['url'])),
+          'message' => t('%url is not a valid SoundCloud URL.', array('%url' => $item['url'])),
         );
       }
     }
@@ -86,7 +86,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
   if ($field['type'] == 'soundcloud') {
     $form['player'] = array(
       '#type'         => 'fieldset',
-      '#title'        => t('Soundcloud settings'),
+      '#title'        => t('SoundCloud settings'),
       '#collapsible'  => TRUE,
       '#collapsed'    => FALSE,
     );
@@ -114,17 +114,17 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#description'    => t('Player height for sets. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT)),
       '#required'       => TRUE,
     );
-    $form['player']['autoplay'] = array(
-      '#type'           => 'checkbox',
-      '#title'          => t('Autoplay'),
-      '#default_value'  => empty($settings['player']['autoplay']) ? FALSE : $settings['player']['autoplay'],
-      '#description'    => t('Player autoplay'),
-    );
     $form['player']['showcomments'] = array(
       '#type'           => 'checkbox',
       '#title'          => t('Show comments'),
       '#default_value'  => empty($settings['player']['showcomments']) ? FALSE : $settings['player']['showcomments'],
       '#description'    => t('Show comments in player'),
+    );
+    $form['player']['autoplay'] = array(
+      '#type'           => 'checkbox',
+      '#title'          => t('Autoplay'),
+      '#default_value'  => empty($settings['player']['autoplay']) ? FALSE : $settings['player']['autoplay'],
+      '#description'    => t('Player autoplay'),
     );
     $form['player']['showplaycount'] = array(
       '#type'           => 'checkbox',
@@ -139,11 +139,11 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#description'    => t('Show artwork in player'),
     );
     $form['player']['color'] = array(
-      '#type'           => 'textfield',
+      '#type'           => module_exists('jquery_colorpicker') ? 'jquery_colorpicker' : 'textfield',
       '#title'          => t('Player color'),
-      '#default_value'  => empty($settings['player']['color']) ? '#000000' : $settings['player']['color'],
+      '#default_value'  => empty($settings['player']['color']) ? 'ff7700' : $settings['player']['color'],
       '#required'       => TRUE,
-      '#description'    => t('Player color in hexadecimal format. Default is #000000.'),
+      '#description'    => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available. '),
     );
   }
 
@@ -156,8 +156,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
 function soundcloudfield_field_widget_info() {
   return array(
     'soundcloud_url' => array(
-      'label'       => t('URL'),
-      'description' => t('Allow the user to enter a Soundcloud URL.'),
+      'label'       => t('SoundCloud URL'),
       'field types' => array('soundcloud'),
       'behaviors'   => array(
         'multiple values' => FIELD_BEHAVIOR_DEFAULT,
@@ -180,7 +179,7 @@ function soundcloudfield_field_widget_form(&$form, &$form_state, $field, $instan
       '#type'           => 'textfield',
       '#title'          => t('SoundCloud URL'),
       '#default_value'  => isset($items[$delta]['url']) ? $items[$delta]['url'] : NULL,
-      '#description'    => t('Please enter a valid Soundcloud track or set URL.')
+      '#description'    => t('Please enter a valid SoundCloud track or set URL.')
     ) + $base;
   }
 
@@ -213,28 +212,61 @@ function soundcloudfield_field_formatter_view($obj_type, $object, $field, $insta
   switch ($display['type']) {
 
     case 'soundcloud_default':
-
       foreach ($items as $delta => $item) {
         $output = '';
 
         $encoded_url = urlencode($item['url']);
         $parsed_url = parse_url($item['url']);
-        $params = 'url=' . $encoded_url . '&amp;show_comments=' . $settings['showcomments'] . '&amp;auto_play=' . $settings['autoplay'] . '&amp;color=' . str_replace('#', '', $settings['color']);
 
-        $output = '<object height="' . $settings['height'] . '" width="' . $settings['width'] . '"><param name="movie" value="http://player.' . $parsed_url['host'] . '/player.swf?' . $params . '"></param>';
-        $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $settings['height'] . '" src="http://player.' . $parsed_url['host'] . '/player.swf?' . $params . '" type="application/x-shockwave-flash" width="' . $settings['width'] . '"></embed></object>';
+        $showcomments = ($settings['showcomments']) ? 'true' : 'false';
+        $autoplay = ($settings['autoplay']) ? 'true' : 'false';
+        $showplaycount = ($settings['showplaycount']) ? 'true' : 'false';
+        $showartwork = ($settings['showartwork']) ? 'true' : 'false';
 
+        $params_track = 'url=' . $encoded_url .
+                        '&amp;show_comments=' . $showcomments .
+                        '&amp;auto_play=' . $autoplay .
+                        '&amp;color=' . $settings['color'];
+//                      '&amp;color=' . str_replace('#', '', $settings['color']);
+
+        $params_set = 'url=' . $encoded_url .
+                      '&amp;show_comments=' . $showcomments .
+                      '&amp;auto_play=' . $autoplay .
+                      '&amp;show_playcount=' . $showplaycount .
+                      '&amp;show_artwork=' . $showartwork .
+                      '&amp;color=' . $settings['color'];
+//                    '&amp;color=' . str_replace('#', '', $settings['color']);
+
+        $splitted_url = explode("/", $parsed_url['path']);
+
+        if ($splitted_url[2] != 'sets') {
+          $output = '<object height="' . $settings['height'] . '" width="' . $settings['width'] . '%"><param name="movie" value="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_track . '"></param>';
+          $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $settings['height'] . '" src="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_track . '" type="application/x-shockwave-flash" width="' . $settings['width'] . '%"></embed></object>';
+        } else {
+          $output = '<object height="' . $settings['set_height'] . '" width="' . $settings['width'] . '%"><param name="movie" value="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_set . '"></param>';
+          $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $settings['set_height'] . '" src="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_set . '" type="application/x-shockwave-flash" width="' . $settings['width'] . '%"></embed></object>';
+        }
         $element[$delta] = array('#markup' => $output);
       }
-    break;
+      break;
 
     case 'soundcloud_link':
       foreach ($items as $delta => $item) {
         $element[$delta] = array('#markup' => l($item['url'], $item['url']));
       }
-    break;
-
+      break;
   }
 
   return $element;
+}
+
+/**
+ * Implement hook_field_error().
+ */
+function soundcloudfield_field_widget_error($element, $error) {
+  switch ($error['error']) {
+    case 'soundcloudfield_invalid_url':
+      form_error($element, $error['message']);
+	  break;
+  }
 }
