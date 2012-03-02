@@ -1,5 +1,5 @@
-name = Soundcloud field
-description = Soundcloud CCK field
+name = SoundCloud field
+description = SoundCloud CCK field
 dependencies[] = content
-package = Soundcloud
+package = SoundCloud
 core = 6.x
