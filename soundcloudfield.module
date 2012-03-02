@@ -42,6 +42,15 @@ function soundcloudfield_field_settings($op, $field) {
   }
 }
 
+/*
+function _player_width_validate($element, &$form_state) {
+  $value = $form_state['values']['width'];
+  if ($value && !is_numeric($value) || $value < 1 || $value > 100) {
+    form_set_error('width', t('Width must be a number between 1 and 100'));
+  }
+}
+*/
+
 /**
  * Implementation of hook_field().
  */
@@ -51,12 +60,19 @@ function soundcloudfield_field($op, &$node, $field, &$items, $teaser, $page) {
       if (is_array($items)) {
         foreach ($items as $delta => $item) {
           $error_element = isset($item['_error_element']) ? $item['_error_element'] : '';
-          if (is_array($item) && isset($item['_error_element'])) unset($item['_error_element']);
-            // $field tomb itt elerheto
+          if (is_array($item) && isset($item['_error_element'])) 
+            unset($item['_error_element']);
+            // $field array available
           if (!empty($item['embed']) && !preg_match('@^http://soundcloud\.com/([^"\&]+)@i', $item['embed'], $matches)) {
-            form_set_error($field['field_name'],t('"%url" is not a valid SoundCloud URL',array('%url' =>  $item['embed'])));
+            form_set_error($field['field_name'],t('"%url" is not a valid SoundCloud URL', array('%url' =>  $item['embed'])));
           }
         }
+      }
+      break;
+
+    case 'sanitize':
+      foreach ($items as $delta => $item) {
+        $items[$delta]['safe'] = check_plain($item['embed']);
       }
       break;
   }
@@ -89,6 +105,21 @@ function soundcloudfield_widget_info() {
   );
 }
 
+
+/**
+ * Implementation of FPAI hook_elements().
+ */
+function soundcloudfield_elements() {
+  return array(
+    'soundcloud_url' => array( // widget name
+      '#input' => TRUE,
+      '#columns' => array('embed'),
+      '#delta' => 0,
+      '#process' => array('soundcloudfield_process'),
+    ),
+  );
+}
+
 /**
  * Implementation of hook_widget_settings().
  */
@@ -99,77 +130,83 @@ function soundcloudfield_widget_settings($op, $widget) {
       if ($widget['type'] == 'soundcloud_url') {
 
         $width = variable_get('soundcloudfield_default_width', SOUNDCLOUDFIELD_DEFAULT_WIDTH);
-        $height = variable_get('soundcloudfield_default_height', SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT);
+        $height = variable_get('soundcloudfield_default_height', SOUNDCLOUDFIELD_DEFAULT_HEIGHT);
         $setheight = variable_get('soundcloudfield_default_setheight', SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT);
 
         $form['player'] = array(
           '#type' => 'fieldset',
-          '#title' => t('Soundcloud set settings'),
-          '#description' => t('Soundcloud set settings'),
+          '#title' => t('SoundCloud settings'),
+          '#description' => t('SoundCloud field settings'),
           '#collapsible' => TRUE,
           '#collapsed' => FALSE,
         );
 
         $form['player']['width'] = array(
           '#type' => 'textfield',
-          '#title' => t('Player display width'),
-          '#default_value' => empty($widget['width']) ? $width : $widget['width'],
+          '#title' => t('Width'),
+          '#size' => 4,
+          '#default_value' => isset($widget['width']) && is_numeric($widget['width']) ? $widget['width'] : $width,
           '#required' => TRUE,
           '#description' => t('Player width. Default is @width.', array('@width' => $width)),
+          // '#element_validate' => array('_player_width_validate'),
         );
 
         $form['player']['height'] = array(
           '#type' => 'textfield',
-          '#title' => t('Player display height'),
-          '#default_value' => empty($widget['height']) ? $height : $widget['height'],
+          '#title' => t('Height for tracks'),
+          '#size' => 4,
+          '#default_value' => isset($widget['height']) && is_numeric($widget['height']) ? $widget['height'] : $height,
           '#required' => TRUE,
-          '#description' => t('Player height. Default is @height.', array('@height' => $height)),
+          '#description' => t('Player height for tracks. Default is @height.', array('@height' => $height)),
         );
 
         $form['player']['setheight'] = array(
           '#type' => 'textfield',
-          '#title' => t('Player display height'),
-          '#default_value' => empty($widget['height']) ? $height : $widget['height'],
+          '#title' => t('Height for sets'),
+          '#size' => 4,
+          '#default_value' => isset($widget['setheight']) && is_numeric($widget['setheight']) ? $widget['setheight'] : $setheight,
           '#required' => TRUE,
-          '#description' => t('Player height. Default is @height.', array('@height' => $height)),
-        );
-
-        $form['player']['autoplay'] = array(
-          '#type' => 'checkbox',
-          '#title' => t('Autoplay'),
-          '#default_value' => empty($widget['autoplay']) ? '' : $widget['autoplay'],
-          '#description' => t('Player autoplay'),
+          '#description' => t('Player height for sets. Default is @height.', array('@height' => $setheight)),
         );
 
         $form['player']['showcomments'] = array(
           '#type' => 'checkbox',
           '#title' => t('Show comments'),
-          '#default_value' => empty($widget['showcomments']) ? '' : $widget['showcomments'],
-          '#description' => t('Showing comment in player'),
+          '#default_value' => isset($widget['showcomments']) ? $widget['showcomments'] : FALSE,
+          '#description' => t('Show comments in player.'),
+        );
+
+        $form['player']['autoplay'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Autoplay'),
+          '#default_value' => isset($widget['autoplay']) ? $widget['autoplay'] : FALSE,
+          '#description' => t('Player autoplay.'),
         );
 
         $form['player']['showplaycount'] = array(
           '#type' => 'checkbox',
           '#title' => t('Show play count'),
-          '#default_value' => empty($widget['showplaycount']) ? '' : $widget['showplaycount'],
-          '#description' => t('Show play count in player'),
+          '#default_value' => isset($widget['showplaycount']) ? $widget['showplaycount'] : FALSE,
+          '#description' => t('Show play count in player.'),
         );
 
-         $form['player']['showartwork'] = array(
+        $form['player']['showartwork'] = array(
           '#type' => 'checkbox',
           '#title' => t('Show artwork'),
-          '#default_value' => empty($widget['showartwork']) ? '' : $widget['showartwork'],
-          '#description' => t('Show artwork in player'),
-        );   
+          '#default_value' => isset($widget['showartwork']) ? $widget['showartwork'] : FALSE,
+          '#description' => t('Show artwork in player.'),
+        );
 
         $form['player']['color'] = array(
-          '#type' => (module_exists('colorpicker') ? 'colorpicker_' : '') . 'textfield',
+          '#type' => module_exists('jquery_colorpicker') ? 'colorpicker' : 'textfield',
           '#title' => t('Player color'),
-          '#default_value' => empty($widget['color']) ? '#000000' : $widget['color'],
+          '#default_value' => isset($widget['color']) ? $widget['color'] : '000000',
           '#required' => TRUE,
-          '#description' => t('Player color.'),
+          '#description' => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
         );
       }
+
+      // var_dump($field);exit();
 
       return $form;
 
@@ -184,23 +221,10 @@ function soundcloudfield_widget_settings($op, $widget) {
      
     case 'save':
       if ($widget['widget_type'] == 'soundcloud_url') {
-        return array('width', 'height', 'autoplay', 'showcomments', 'showplaycount', 'showartwork', 'color', 's_set'=>TRUE);
+        $settings = array('width', 'height', 'setheight', 'autoplay', 'showcomments', 'showplaycount', 'showartwork', 'color');
       }
+      return $settings;
   }
-}
-
-/**
- * Implementation of hook_elements().
- */
-function soundcloudfield_elements() {
-  return array(
-    'soundcloud_url' => array( // widget name
-      '#input' => TRUE,
-      '#columns' => array('embed'),
-      '#delta' => 0,
-      '#process' => array('soundcloudfield_process'),
-    ),     
-  );
 }
 
 /**
@@ -229,19 +253,23 @@ function soundcloudfield_process($element, $edit, $form_state, $form) {
   $field_key = $element['#columns'][0];    // $field_key = 'embed'
   $delta = $element['#delta'];
  
-  // szoveges beviteli mezo 
   $element[$field_key] = array(
     '#type' => 'textfield',
-    '#default_value' => isset($element['#value'][$field_key]) ? $element['#value'][$field_key] : NULL,
-
     '#title' => $element['#title'],
-    '#description' => 'Here you can type the URL of the Soundcloud track or set, depending on what field type do you use',
+    '#description' => 'Here you can type the URL of the Soundcloud track or set',     // $field['widget']['description']
     '#required' => $element['#required'],
     '#maxlength' => 255,
+    '#size' => !empty($field['widget']['size']) ? $field['widget']['size'] : 48,
+
+    '#default_value' => isset($element['#value'][$field_key]) ? $element['#value'][$field_key] : NULL,
+
   );
   return $element;
 }
 
+function theme_soundcloud_url($element) {
+  return $element['#children'];
+}
 
 //==========================================//
 // DEFINING A FORMATTER
@@ -255,10 +283,13 @@ function soundcloudfield_theme() {
     'soundcloud_url' => array(
       'arguments' => array('element' => NULL),
     ),
-    'soundcloudfield_set' => array(
+    'soundcloudfield_formatter_default' => array(
       'arguments' => array('element' => NULL),
     ),
-    'soundcloudfield_formatter_default' => array(
+    'soundcloudfield_formatter_html5' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'soundcloudfield_formatter_link' => array(
       'arguments' => array('element' => NULL),
     ),
   );
@@ -293,8 +324,8 @@ function soundcloudfield_field_formatter_info() {
 function theme_soundcloudfield_formatter_default($element) {
   $output = '';
 
-  if (!empty($element['#item']['embed'])) {
-    $field_info = soundcloudfield_get_content_node_field_instance_by_field_name($element['#field_name']);  // adatbazisbol kinyerjuk a widget beallitasait, ehhez egy fgv-t hasznalunk
+  // if (!empty($element['#item']['embed'])) {
+    $field_info = soundcloudfield_get_content_node_field_instance_by_field_name($element['#field_name']);  // adatbazisbol kinyerjuk a widget beallitasait
  
     if ($field_info['widget_type'] == 'soundcloud_url') {
       $field_info['widget_settings'] = unserialize($field_info['widget_settings']);
@@ -308,6 +339,7 @@ function theme_soundcloudfield_formatter_default($element) {
   
       $encoded_url = urlencode($element['#item']['embed']);
       $parsed_url = parse_url($element['#item']['embed']);
+
       $params = 'url=' . $encoded_url .
                 '&amp;show_comments=' . $field_info['widget_settings']['showcomments'] .
       					'&amp;auto_play=' . $field_info['widget_settings']['autoplay'] .
@@ -320,18 +352,67 @@ function theme_soundcloudfield_formatter_default($element) {
     }
        
     return $output;
-  }
-  else {
-    return NULL;
+  // }
+  // else {
+    // return NULL;
+  // }
+}
+
+function theme_soundcloudfield_formatter_html5($element) {
+  $output = '';
+  $oembed_endpoint = 'http://soundcloud.com/oembed';
+
+  $field_info = soundcloudfield_get_content_node_field_instance_by_field_name($element['#field_name']);  // adatbazisbol kinyerjuk a widget beallitasait
+  if ($field_info['widget_type'] == 'soundcloud_url') {
+
+    $field_info['widget_settings'] = unserialize($field_info['widget_settings']);
+
+    $autoplay = $field_info['widget_settings']['autoplay'] ? 'true' : 'false';
+    $showartwork = $field_info['widget_settings']['showartwork'] ? 'true' : 'false';
+    $width = $field_info['widget_settings']['width'];
+    $color = $field_info['widget_settings']['color'];
+
+    // var_dump($field_info);
+
+    $encoded_url = urlencode($element['#item']['embed']);
+    $oembed_url = $oembed_endpoint . '?iframe=true&url=' . $encoded_url;
+
+    $oembed = simplexml_load_string(soundcloudfield_curl_get($oembed_url));
+
+    // Replace player default settings with our settings
+    $final_iframe = preg_replace('/(width=)"([^"]+)"/', 'width="' . $width . '%"', $oembed->html);
+
+    if (preg_match('/auto_play=(true|false)/', $final_iframe)) {
+      $final_iframe = preg_replace('/auto_play=(true|false)/', 'auto_play=' . $autoplay, $final_iframe);
+    }
+    else {
+      $final_iframe = preg_replace('/">/', '&auto_play=' . $autoplay . '">', $final_iframe);
+    }
+
+    if (preg_match('/show_artwork=(true|false)/', $final_iframe)) {
+      $final_iframe = preg_replace('/show_artwork=(true|false)/', 'show_artwork=' . $showartwork, $final_iframe);
+    }
+    else {
+      $final_iframe = preg_replace('/">/', '&show_artwork='.$showartwork . '">', $final_iframe);
+    }
+
+    if (preg_match('/color=([a-zA-Z0-9]{6})/', $final_iframe)) {
+      $final_iframe = preg_replace('/color=([a-zA-Z0-9]{6})/', 'color=' . $color, $final_iframe);
+    }
+    else {
+      $final_iframe = preg_replace('/">/', '&color=' . $color . '">', $final_iframe);
+    }
+
+    $output = html_entity_decode($final_iframe);  // '$oembed->html' for original embed
+
+    return $output;
   }
 }
 
-function theme_soundcloud_url($element) {
-  return $element['#children'];
-}
+function theme_soundcloudfield_formatter_link($element) {
+  $output = l($element['#item']['safe'], $element['#item']['safe']);
 
-function theme_soundcloudfield_set($element) {
-  return $element['#children'];
+  return $output;
 }
 
 /**
@@ -345,4 +426,17 @@ function theme_soundcloudfield_set($element) {
  */
 function soundcloudfield_get_content_node_field_instance_by_field_name($field_name) {
   return db_fetch_array(db_query("SELECT * FROM {content_node_field_instance} WHERE field_name = '%s'", $field_name));
+}
+
+/*
+ * Curl helper function
+ */
+function soundcloudfield_curl_get($url) {
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    $return = curl_exec($curl);
+    curl_close($curl);
+    return $return;
 }
