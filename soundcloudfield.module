@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @file
+ * SoundCloud CCK field
+ *
+ *
+ * @author Attila Fekete - attila.fekete@yahoo.co.uk
+ */
+
 define('SOUNDCLOUDFIELD_DEFAULT_WIDTH', 100);
 define('SOUNDCLOUDFIELD_DEFAULT_HEIGHT', 81);
 define('SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT', 305);
@@ -62,7 +70,6 @@ function soundcloudfield_field($op, &$node, $field, &$items, $teaser, $page) {
           $error_element = isset($item['_error_element']) ? $item['_error_element'] : '';
           if (is_array($item) && isset($item['_error_element'])) 
             unset($item['_error_element']);
-            // $field array available
           if (!empty($item['embed']) && !preg_match('@^http://soundcloud\.com/([^"\&]+)@i', $item['embed'], $matches)) {
             form_set_error($field['field_name'],t('"%url" is not a valid SoundCloud URL', array('%url' =>  $item['embed'])));
           }
@@ -147,7 +154,7 @@ function soundcloudfield_widget_settings($op, $widget) {
           '#size' => 4,
           '#default_value' => isset($widget['width']) && is_numeric($widget['width']) ? $widget['width'] : $width,
           '#required' => TRUE,
-          '#description' => t('Player width. Default is @width.', array('@width' => $width)),
+          '#description' => t('Player width in percent. Default is @width.', array('@width' => $width)),
           // '#element_validate' => array('_player_width_validate'),
         );
 
@@ -200,9 +207,9 @@ function soundcloudfield_widget_settings($op, $widget) {
         $form['player']['color'] = array(
           '#type' => module_exists('jquery_colorpicker') ? 'colorpicker' : 'textfield',
           '#title' => t('Player color'),
-          '#default_value' => isset($widget['color']) ? $widget['color'] : '000000',
+          '#default_value' => isset($widget['color']) ? $widget['color'] : '0678be',
           '#required' => TRUE,
-          '#description' => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
+          '#description' => t('Player color in hexadecimal format. Default is 0678be. Turn on the jQuery Colorpicker module if available.'),
         );
       }
 
@@ -211,26 +218,26 @@ function soundcloudfield_widget_settings($op, $widget) {
       return $form;
 
     case 'validate':
-      if (!is_numeric($widget['width']) || intval($widget['width']) != $widget['width'] || $widget['width'] < 1) {
-        form_set_error('width', t('"Player width" must be a positive integer.'));
+      if (!is_numeric($widget['width']) || intval($widget['width']) != $widget['width'] || $widget['width'] < 1 || $widget['width'] > 100) {
+        form_set_error('width', t('Player width must be a positive integer between 1-100'));
       }
       if (!is_numeric($widget['height']) || intval($widget['height']) != $widget['height'] || $widget['height'] < 1) {
-        form_set_error('height', t('"Player height" must be a positive integer.'));
+        form_set_error('height', t('Player height must be a positive integer.'));
       }
-    // a parameterek a $field['widget'] tombben lesznek
+      if (!is_numeric($widget['setheight']) || intval($widget['setheight']) != $widget['setheight'] || $widget['setheight'] < 1) {
+        form_set_error('setheight', t('Player height for sets must be a positive integer.'));
+      }
      
     case 'save':
       if ($widget['widget_type'] == 'soundcloud_url') {
-        $settings = array('width', 'height', 'setheight', 'autoplay', 'showcomments', 'showplaycount', 'showartwork', 'color');
+        $settings = array('width', 'height', 'setheight', 'showcomments', 'autoplay', 'showplaycount', 'showartwork', 'color');
       }
       return $settings;
   }
 }
 
 /**
- * Implementation of hook_widget().
- * 
- * amikor a CCK hozzaadja a mezonket az urlaphoz, tudatjuk vele, hogy allitsa be a megfelelo widget tipust es az alapertelmezett erteket, ha az letezik
+ * Implementation of hook_widget(). 
  */
 function soundcloudfield_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $element = array(
@@ -247,7 +254,6 @@ function soundcloudfield_widget(&$form, &$form_state, $field, $items, $delta = 0
  *
  * The $fields array is in $form['#field_info'][$element['#field_name']]
  */
-
 function soundcloudfield_process($element, $edit, $form_state, $form) {
   $field = $form['#field_info'][$element['#field_name']];
   $field_key = $element['#columns'][0];    // $field_key = 'embed'
@@ -325,54 +331,65 @@ function theme_soundcloudfield_formatter_default($element) {
   $output = '';
 
   // if (!empty($element['#item']['embed'])) {
-    $field_info = soundcloudfield_get_content_node_field_instance_by_field_name($element['#field_name']);  // adatbazisbol kinyerjuk a widget beallitasait
+    $field_info = soundcloudfield_get_content_node_field_instance_by_field_name($element['#field_name']);
  
     if ($field_info['widget_type'] == 'soundcloud_url') {
       $field_info['widget_settings'] = unserialize($field_info['widget_settings']);
-      $field_info['widget_settings']['showcomments'] = $field_info['widget_settings']['showcomments'] ? 'true' : 'false';
-      $field_info['widget_settings']['autoplay'] = $field_info['widget_settings']['autoplay'] ? 'true' : 'false';
-      $field_info['widget_settings']['showplaycount'] = $field_info['widget_settings']['showplaycount'] ? 'true' : 'false';
-      $field_info['widget_settings']['showartwork'] = $field_info['widget_settings']['showartwork'] ? 'true' : 'false';
-      
+
       $width = $field_info['widget_settings']['width'];
-      $height = $field_info['widget_settings']['height'];;
-  
+      $color = $field_info['widget_settings']['color'];
+
+      $showcomments = $field_info['widget_settings']['showcomments'] ? 'true' : 'false';
+      $autoplay = $field_info['widget_settings']['autoplay'] ? 'true' : 'false';
+      $showplaycount = $field_info['widget_settings']['showplaycount'] ? 'true' : 'false';
+      $showartwork = $field_info['widget_settings']['showartwork'] ? 'true' : 'false';
+      
       $encoded_url = urlencode($element['#item']['embed']);
       $parsed_url = parse_url($element['#item']['embed']);
 
-      $params = 'url=' . $encoded_url .
-                '&amp;show_comments=' . $field_info['widget_settings']['showcomments'] .
-      					'&amp;auto_play=' . $field_info['widget_settings']['autoplay'] .
-                '&amp;show_playcount=' . $field_info['widget_settings']['showplaycount'] .
-      					'&amp;show_artwork=' . $field_info['widget_settings']['showartwork'] .
-      					'&amp;color=' . str_replace('#', '', $field_info['widget_settings']['color']);
+      $splitted_url = explode("/", $parsed_url['path']);
 
-      $output .= '<object height="' . $height . '" width="' . $width . '%"><param name="movie" value="http://player.' . $parsed_url['host'] . '/player.swf?' . $params . '"></param>';
+      if ($splitted_url[2] != 'sets') {
+        $height = $field_info['widget_settings']['height'];
+        $params = 'url=' . $encoded_url .
+                  '&amp;show_comments=' . $showcomments .
+                  '&amp;auto_play=' . $autoplay .
+                  '&amp;color=' . $color;
+      }
+      else {
+        $height = $field_info['widget_settings']['setheight'];
+        $params = 'url=' . $encoded_url .
+                  '&amp;show_comments=' . $showcomments .
+                  '&amp;auto_play=' . $autoplay .
+                  '&amp;show_playcount=' . $showplaycount .
+                  '&amp;show_artwork=' . $showartwork .
+                  '&amp;color=' . $color;
+      }
+
+      $output .= '<object height="' . $height . '" width="' . $width . '%"><param name="movie" value="https://player.' . $parsed_url['host'] . '/player.swf?' . $params . '"></param>';
       $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $height . '" src="http://player.' . $parsed_url['host'] . '/player.swf?' . $params . '" type="application/x-shockwave-flash" width="' . $width . '%"></embed></object>';
     }
        
     return $output;
-  // }
-  // else {
+    // }
+    // else {
     // return NULL;
-  // }
+    // }
 }
 
 function theme_soundcloudfield_formatter_html5($element) {
   $output = '';
   $oembed_endpoint = 'http://soundcloud.com/oembed';
 
-  $field_info = soundcloudfield_get_content_node_field_instance_by_field_name($element['#field_name']);  // adatbazisbol kinyerjuk a widget beallitasait
-  if ($field_info['widget_type'] == 'soundcloud_url') {
+  $field_info = soundcloudfield_get_content_node_field_instance_by_field_name($element['#field_name']);
 
+  if ($field_info['widget_type'] == 'soundcloud_url') {
     $field_info['widget_settings'] = unserialize($field_info['widget_settings']);
 
+    $width = $field_info['widget_settings']['width'];
     $autoplay = $field_info['widget_settings']['autoplay'] ? 'true' : 'false';
     $showartwork = $field_info['widget_settings']['showartwork'] ? 'true' : 'false';
-    $width = $field_info['widget_settings']['width'];
     $color = $field_info['widget_settings']['color'];
-
-    // var_dump($field_info);
 
     $encoded_url = urlencode($element['#item']['embed']);
     $oembed_url = $oembed_endpoint . '?iframe=true&url=' . $encoded_url;
@@ -393,7 +410,7 @@ function theme_soundcloudfield_formatter_html5($element) {
       $final_iframe = preg_replace('/show_artwork=(true|false)/', 'show_artwork=' . $showartwork, $final_iframe);
     }
     else {
-      $final_iframe = preg_replace('/">/', '&show_artwork='.$showartwork . '">', $final_iframe);
+      $final_iframe = preg_replace('/">/', '&show_artwork=' . $showartwork . '">', $final_iframe);
     }
 
     if (preg_match('/color=([a-zA-Z0-9]{6})/', $final_iframe)) {
