@@ -1,4 +1,11 @@
 <?php
+/**
+ * @file
+ *
+ *
+ *
+ * @author Attila Fekete - http://drupal.org/user/762986
+ */
 
 define('SOUNDCLOUDFIELD_DEFAULT_WIDTH', 100);
 define('SOUNDCLOUDFIELD_DEFAULT_HEIGHT', 81);
@@ -29,25 +36,11 @@ function soundcloudfield_field_info() {
 }
 
 /**
- * Implements hook_field_schema().
- */
-function soundcloudfield_field_schema($field) {
-  if ($field['type'] == 'soundcloud') {
-    $schema['columns']['url'] = array(
-      'type'      => 'varchar',
-      'length'    => 255,
-      'not null'  => FALSE,
-    );
-
-    return $schema;
-  }
-}
-
-/**
  * Implements hook_field_validate().
  *
  * Pseudo-hook.
  */
+// function soundcloudfield_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
 function soundcloudfield_field_validate($obj_type, $object, $field, $instance, $langcode, &$items, &$errors) {
   if ($field['type'] == 'soundcloud') {
     foreach ($items as $delta => $item) {
@@ -84,6 +77,9 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
   $settings = $instance['settings'];
 
   if ($field['type'] == 'soundcloud') {
+    $form = array(
+      '#element_validate' => array('soundcloudfield_settings_form_validate'),
+    );
     $form['player'] = array(
       '#type'         => 'fieldset',
       '#title'        => t('SoundCloud settings'),
@@ -91,28 +87,31 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#collapsed'    => FALSE,
     );
     $form['player']['width'] = array(
-      '#type'           => 'textfield',
-      '#title'          => t('Width'),
-      '#size'           => 4,
-      '#default_value'  => empty($settings['player']['width']) ? SOUNDCLOUDFIELD_DEFAULT_WIDTH : $settings['player']['width'],
-      '#description'    => t('Player width. Default is @width.', array('@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH)),
-      '#required'       => TRUE,
+      '#type'             => 'textfield',
+      '#title'            => t('Width'),
+      '#size'             => 4,
+      '#default_value'    => empty($settings['player']['width']) ? SOUNDCLOUDFIELD_DEFAULT_WIDTH : $settings['player']['width'],
+      '#description'      => t('Player width in percent. Default is @width.', array('@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH)),
+      '#required'         => TRUE,
+      '#element_validate' => array('element_validate_integer_positive'),
     );
     $form['player']['height'] = array(
-      '#type'           => 'textfield',
-      '#title'          => t('Height for tracks'),
-      '#size'           => 4,
-      '#default_value'  => empty($settings['player']['height']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT : $settings['player']['height'],
-      '#description'    => t('Player height for tracks. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT)),
-      '#required'       => TRUE,
+      '#type'             => 'textfield',
+      '#title'            => t('Height for tracks'),
+      '#size'             => 4,
+      '#default_value'    => empty($settings['player']['height']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT : $settings['player']['height'],
+      '#description'      => t('Player height for tracks. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT)),
+      '#required'         => TRUE,
+      '#element_validate' => array('element_validate_integer_positive'),
     );
     $form['player']['set_height'] = array(
-      '#type'           => 'textfield',
-      '#title'          => t('Height for sets'),
-      '#size'           => 4,
-      '#default_value'  => empty($settings['player']['set_height']) ? SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT : $settings['player']['set_height'],
-      '#description'    => t('Player height for sets. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT)),
-      '#required'       => TRUE,
+      '#type'             => 'textfield',
+      '#title'            => t('Height for sets'),
+      '#size'             => 4,
+      '#default_value'    => empty($settings['player']['set_height']) ? SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT : $settings['player']['set_height'],
+      '#description'      => t('Player height for sets. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT)),
+      '#required'         => TRUE,
+      '#element_validate' => array('element_validate_integer_positive'),
     );
     $form['player']['showcomments'] = array(
       '#type'           => 'checkbox',
@@ -143,11 +142,20 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#title'          => t('Player color'),
       '#default_value'  => empty($settings['player']['color']) ? 'ff7700' : $settings['player']['color'],
       '#required'       => TRUE,
-      '#description'    => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available. '),
+      '#description'    => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
     );
   }
 
   return $form;
+}
+
+/**
+ * Validate the field settings form
+ */
+function soundcloudfield_settings_form_validate($element, &$form_state, $complete_form) {
+  if (!empty($form_state['values']['instance']['settings']['player']['width']) && ($form_state['values']['instance']['settings']['player']['width'] < 1 || $form_state['values']['instance']['settings']['player']['width'] > 100)) {
+    form_set_error('instance][settings][player][width', t('Player width must be a positive integer between 1-100'));
+  }
 }
 
 /**
@@ -177,9 +185,7 @@ function soundcloudfield_field_widget_form(&$form, &$form_state, $field, $instan
   if ($instance['widget']['type'] == 'soundcloud_url') {
     $element['url'] = array(
       '#type'           => 'textfield',
-      '#title'          => t('SoundCloud URL'),
       '#default_value'  => isset($items[$delta]['url']) ? $items[$delta]['url'] : NULL,
-      '#description'    => t('Please enter a valid SoundCloud track or set URL.')
     ) + $base;
   }
 
@@ -227,30 +233,28 @@ function soundcloudfield_field_formatter_view($obj_type, $object, $field, $insta
         $encoded_url = urlencode($item['url']);
         $parsed_url = parse_url($item['url']);
 
-
-        $params_track = 'url=' . $encoded_url .
-                        '&amp;show_comments=' . $showcomments .
-                        '&amp;auto_play=' . $autoplay .
-                        '&amp;color=' . $color;
-//                      '&amp;color=' . str_replace('#', '', $color);
-
-        $params_set = 'url=' . $encoded_url .
-                      '&amp;show_comments=' . $showcomments .
-                      '&amp;auto_play=' . $autoplay .
-                      '&amp;show_playcount=' . $showplaycount .
-                      '&amp;show_artwork=' . $showartwork .
-                      '&amp;color=' . $color;
-//                    '&amp;color=' . str_replace('#', '', $color);
-
         $splitted_url = explode("/", $parsed_url['path']);
 
         if ($splitted_url[2] != 'sets') {
-          $output = '<object height="' . $settings['height'] . '" width="' . $settings['width'] . '%"><param name="movie" value="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_track . '"></param>';
-          $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $settings['height'] . '" src="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_track . '" type="application/x-shockwave-flash" width="' . $settings['width'] . '%"></embed></object>';
-        } else {
-          $output = '<object height="' . $settings['set_height'] . '" width="' . $settings['width'] . '%"><param name="movie" value="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_set . '"></param>';
-          $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $settings['set_height'] . '" src="https://player.' . $parsed_url['host'] . '/player.swf?' . $params_set . '" type="application/x-shockwave-flash" width="' . $settings['width'] . '%"></embed></object>';
+          $height = $settings['height'];
+          $params = 'url=' . $encoded_url .
+                    '&amp;show_comments=' . $showcomments .
+                    '&amp;auto_play=' . $autoplay .
+                    '&amp;color=' . $color;
         }
+        else {
+          $height = $settings['set_height'];
+          $params = 'url=' . $encoded_url .
+                    '&amp;show_comments=' . $showcomments .
+                    '&amp;auto_play=' . $autoplay .
+                    '&amp;show_playcount=' . $showplaycount .
+                    '&amp;show_artwork=' . $showartwork .
+                    '&amp;color=' . $color;
+        }
+
+        $output = '<object height="' . $height . '" width="' . $settings['width'] . '%"><param name="movie" value="https://player.' . $parsed_url['host'] . '/player.swf?' . $params . '"></param>';
+        $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $height . '" src="https://player.' . $parsed_url['host'] . '/player.swf?' . $params . '" type="application/x-shockwave-flash" width="' . $settings['width'] . '%"></embed></object>';
+
         $element[$delta] = array('#markup' => $output);
       }
       break;
@@ -266,28 +270,30 @@ function soundcloudfield_field_formatter_view($obj_type, $object, $field, $insta
         $oembed_url = $oembed_endpoint . '?iframe=true&url=' . ($encoded_url);
 
         // Load in the oEmbed XML
-        $oembed = simplexml_load_string(curl_get($oembed_url));
+        $oembed = simplexml_load_string(soundcloudfield_curl_get($oembed_url));
 
         // Replace player default settings with our settings
-        $final_iframe = preg_replace('/(width=)"([^"]+)"/', 'width="'.$settings['width'].'%"', $oembed->html);
-//      $final_iframe = preg_replace('/(height=)"([^"]+)"/', 'height="'.$settings['height'].'"', $final_iframe);
+        $final_iframe = preg_replace('/(width=)"([^"]+)"/', 'width="' . $settings['width'] . '%"', $oembed->html);
 
         if (preg_match('/auto_play=(true|false)/', $final_iframe)) {
-          $final_iframe = preg_replace('/auto_play=(true|false)/', 'auto_play='.$autoplay, $final_iframe);
-        } else {
-          $final_iframe = preg_replace('/">/', '&auto_play='.$autoplay.'">', $final_iframe);
+          $final_iframe = preg_replace('/auto_play=(true|false)/', 'auto_play=' . $autoplay, $final_iframe);
+        }
+        else {
+          $final_iframe = preg_replace('/">/', '&auto_play=' . $autoplay . '">', $final_iframe);
         }
 
         if (preg_match('/show_artwork=(true|false)/', $final_iframe)) {
-          $final_iframe = preg_replace('/show_artwork=(true|false)/', 'show_artwork='.$showartwork, $final_iframe);
-        } else {
-          $final_iframe = preg_replace('/">/', '&show_artwork='.$showartwork.'">', $final_iframe);
+          $final_iframe = preg_replace('/show_artwork=(true|false)/', 'show_artwork=' . $showartwork, $final_iframe);
+        }
+        else {
+          $final_iframe = preg_replace('/">/', '&show_artwork=' . $showartwork . '">', $final_iframe);
         }
 
         if (preg_match('/color=([a-zA-Z0-9]{6})/', $final_iframe)) {
-          $final_iframe = preg_replace('/color=([a-zA-Z0-9]{6})/', 'color='.$color, $final_iframe);
-        } else {
-          $final_iframe = preg_replace('/">/', '&color='.$color.'">', $final_iframe);
+          $final_iframe = preg_replace('/color=([a-zA-Z0-9]{6})/', 'color=' . $color, $final_iframe);
+        }
+        else {
+          $final_iframe = preg_replace('/">/', '&color=' . $color . '">', $final_iframe);
         }
 
         $output = html_entity_decode($final_iframe);  // '$oembed->html' for original embed
@@ -313,14 +319,14 @@ function soundcloudfield_field_widget_error($element, $error) {
   switch ($error['error']) {
     case 'soundcloudfield_invalid_url':
       form_error($element, $error['message']);
-	  break;
+      break;
   }
 }
 
 /*
  * Curl helper function
  */
-function curl_get($url) {
+function soundcloudfield_curl_get($url) {
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
