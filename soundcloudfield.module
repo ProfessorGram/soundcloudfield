@@ -43,7 +43,7 @@ function soundcloudfield_field_info() {
 function soundcloudfield_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {
   if ($field['type'] == 'soundcloud') {
     foreach ($items as $delta => $item) {
-      if (!empty($item['url']) && !preg_match('@^http://soundcloud\.com/([^"\&]+)@i', $item['url'], $matches)) {
+      if (!empty($item['url']) && !preg_match('@^https?://soundcloud\.com/([^"\&]+)@i', $item['url'], $matches)) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error'   => 'soundcloudfield_invalid_url',
           'message' => t('%url is not a valid SoundCloud URL.', array('%url' => $item['url'])),
