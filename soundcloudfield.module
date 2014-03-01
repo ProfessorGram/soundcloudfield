@@ -20,16 +20,16 @@ function soundcloudfield_field_info() {
       'label' => t('SoundCloud'),
       'description' => t('This field stores a SoundCloud track or set URL.'),
       'instance_settings' => array(
-        'width'         => SOUNDCLOUDFIELD_DEFAULT_WIDTH,
-        'height'        => SOUNDCLOUDFIELD_DEFAULT_HEIGHT,
-        'set_height'    => SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT,
-        'autoplay'      => FALSE,
-        'showcomments'  => FALSE,
+        'width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH,
+        'height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT,
+        'set_height' => SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT,
+        'autoplay' => FALSE,
+        'showcomments' => FALSE,
         'showplaycount' => FALSE,
-        'showartwork'   => FALSE,
-        'color'         => 'ff7700',
+        'showartwork' => FALSE,
+        'color' => 'ff7700',
       ),
-      'default_widget'    => 'soundcloud_url',
+      'default_widget' => 'soundcloud_url',
       'default_formatter' => 'soundcloud_default',
     ),
   );
@@ -45,7 +45,7 @@ function soundcloudfield_field_validate($entity_type, $entity, $field, $instance
     foreach ($items as $delta => $item) {
       if (!empty($item['url']) && !preg_match('@^https?://soundcloud\.com/([^"\&]+)@i', $item['url'], $matches)) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error'   => 'soundcloudfield_invalid_url',
+          'error' => 'soundcloudfield_invalid_url',
           'message' => t('%url is not a valid SoundCloud URL.', array('%url' => $item['url'])),
         );
       }
@@ -80,68 +80,68 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#element_validate' => array('soundcloudfield_settings_form_validate'),
     );
     $form['soundcloudplayer'] = array(
-      '#type'         => 'fieldset',
-      '#title'        => t('SoundCloud settings'),
-      '#collapsible'  => TRUE,
-      '#collapsed'    => FALSE,
+      '#type' => 'fieldset',
+      '#title' => t('SoundCloud settings'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
     );
     $form['soundcloudplayer']['width'] = array(
-      '#type'             => 'textfield',
-      '#title'            => t('Width'),
-      '#size'             => 4,
-      '#default_value'    => empty($settings['soundcloudplayer']['width']) ? SOUNDCLOUDFIELD_DEFAULT_WIDTH : $settings['soundcloudplayer']['width'],
-      '#description'      => t('Player width in percent. Default is @width.', array('@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH)),
-      '#required'         => TRUE,
+      '#type' => 'textfield',
+      '#title' => t('Width'),
+      '#size' => 4,
+      '#default_value' => empty($settings['soundcloudplayer']['width']) ? SOUNDCLOUDFIELD_DEFAULT_WIDTH : $settings['soundcloudplayer']['width'],
+      '#description' => t('Player width in percent. Default is @width.', array('@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH)),
+      '#required' => TRUE,
       '#element_validate' => array('element_validate_integer_positive'),
     );
     $form['soundcloudplayer']['height'] = array(
-      '#type'             => 'textfield',
-      '#title'            => t('Height for tracks'),
-      '#size'             => 4,
-      '#default_value'    => empty($settings['soundcloudplayer']['height']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT : $settings['soundcloudplayer']['height'],
-      '#description'      => t('Player height for tracks. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT)),
-      '#required'         => TRUE,
+      '#type' => 'textfield',
+      '#title' => t('Height for tracks'),
+      '#size' => 4,
+      '#default_value' => empty($settings['soundcloudplayer']['height']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT : $settings['soundcloudplayer']['height'],
+      '#description' => t('Player height for tracks. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT)),
+      '#required' => TRUE,
       '#element_validate' => array('element_validate_integer_positive'),
     );
     $form['soundcloudplayer']['set_height'] = array(
-      '#type'             => 'textfield',
-      '#title'            => t('Height for sets'),
-      '#size'             => 4,
-      '#default_value'    => empty($settings['soundcloudplayer']['set_height']) ? SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT : $settings['soundcloudplayer']['set_height'],
-      '#description'      => t('Player height for sets. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT)),
-      '#required'         => TRUE,
+      '#type' => 'textfield',
+      '#title' => t('Height for sets'),
+      '#size' => 4,
+      '#default_value' => empty($settings['soundcloudplayer']['set_height']) ? SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT : $settings['soundcloudplayer']['set_height'],
+      '#description' => t('Player height for sets. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_SET_HEIGHT)),
+      '#required' => TRUE,
       '#element_validate' => array('element_validate_integer_positive'),
     );
     $form['soundcloudplayer']['showcomments'] = array(
-      '#type'           => 'checkbox',
-      '#title'          => t('Show comments'),
-      '#default_value'  => empty($settings['soundcloudplayer']['showcomments']) ? FALSE : $settings['soundcloudplayer']['showcomments'],
-      '#description'    => t('Show comments in player'),
+      '#type' => 'checkbox',
+      '#title' => t('Show comments'),
+      '#default_value' => empty($settings['soundcloudplayer']['showcomments']) ? FALSE : $settings['soundcloudplayer']['showcomments'],
+      '#description' => t('Show comments in player'),
     );
     $form['soundcloudplayer']['autoplay'] = array(
-      '#type'           => 'checkbox',
-      '#title'          => t('Autoplay'),
-      '#default_value'  => empty($settings['soundcloudplayer']['autoplay']) ? FALSE : $settings['soundcloudplayer']['autoplay'],
-      '#description'    => t('Player autoplay'),
+      '#type' => 'checkbox',
+      '#title' => t('Autoplay'),
+      '#default_value' => empty($settings['soundcloudplayer']['autoplay']) ? FALSE : $settings['soundcloudplayer']['autoplay'],
+      '#description' => t('Player autoplay'),
     );
     $form['soundcloudplayer']['showplaycount'] = array(
-      '#type'           => 'checkbox',
-      '#title'          => t('Show play count'),
-      '#default_value'  => empty($settings['soundcloudplayer']['showplaycount']) ? FALSE : $settings['soundcloudplayer']['showplaycount'],
-      '#description'    => t('Show play count in player'),
+      '#type' => 'checkbox',
+      '#title' => t('Show play count'),
+      '#default_value' => empty($settings['soundcloudplayer']['showplaycount']) ? FALSE : $settings['soundcloudplayer']['showplaycount'],
+      '#description' => t('Show play count in player'),
     );
     $form['soundcloudplayer']['showartwork'] = array(
-      '#type'           => 'checkbox',
-      '#title'          => t('Show artwork'),
-      '#default_value'  => empty($settings['soundcloudplayer']['showartwork']) ? FALSE : $settings['soundcloudplayer']['showartwork'],
-      '#description'    => t('Show artwork in player'),
+      '#type' => 'checkbox',
+      '#title' => t('Show artwork'),
+      '#default_value' => empty($settings['soundcloudplayer']['showartwork']) ? FALSE : $settings['soundcloudplayer']['showartwork'],
+      '#description' => t('Show artwork in player'),
     );
     $form['soundcloudplayer']['color'] = array(
-      '#type'           => module_exists('jquery_colorpicker') ? 'jquery_colorpicker' : 'textfield',
-      '#title'          => t('Player color'),
-      '#default_value'  => empty($settings['soundcloudplayer']['color']) ? 'ff7700' : $settings['soundcloudplayer']['color'],
-      '#required'       => TRUE,
-      '#description'    => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
+      '#type' => module_exists('jquery_colorpicker') ? 'jquery_colorpicker' : 'textfield',
+      '#title' => t('Player color'),
+      '#default_value' => empty($settings['soundcloudplayer']['color']) ? 'ff7700' : $settings['soundcloudplayer']['color'],
+      '#required' => TRUE,
+      '#description' => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
     );
   }
 
@@ -149,7 +149,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
 }
 
 /**
- * Validate the field settings form
+ * Validate the field settings form.
  */
 function soundcloudfield_settings_form_validate($element, &$form_state, $complete_form) {
   if (!empty($form_state['values']['instance']['settings']['soundcloudplayer']['width']) && ($form_state['values']['instance']['settings']['soundcloudplayer']['width'] < 1 || $form_state['values']['instance']['settings']['soundcloudplayer']['width'] > 100)) {
@@ -163,11 +163,11 @@ function soundcloudfield_settings_form_validate($element, &$form_state, $complet
 function soundcloudfield_field_widget_info() {
   return array(
     'soundcloud_url' => array(
-      'label'       => t('SoundCloud URL'),
+      'label' => t('SoundCloud URL'),
       'field types' => array('soundcloud'),
-      'behaviors'   => array(
+      'behaviors' => array(
         'multiple values' => FIELD_BEHAVIOR_DEFAULT,
-        'default value'   => FIELD_BEHAVIOR_DEFAULT,
+        'default value' => FIELD_BEHAVIOR_DEFAULT,
       ),
     ),
   );
@@ -183,8 +183,8 @@ function soundcloudfield_field_widget_form(&$form, &$form_state, $field, $instan
 
   if ($instance['widget']['type'] == 'soundcloud_url') {
     $element['url'] = array(
-      '#type'           => 'textfield',
-      '#default_value'  => isset($items[$delta]['url']) ? $items[$delta]['url'] : NULL,
+      '#type' => 'textfield',
+      '#default_value' => isset($items[$delta]['url']) ? $items[$delta]['url'] : NULL,
     ) + $base;
   }
 
@@ -197,15 +197,15 @@ function soundcloudfield_field_widget_form(&$form, &$form_state, $field, $instan
 function soundcloudfield_field_formatter_info() {
   return array(
     'soundcloud_default' => array(
-      'label'       => t('Flash player'),
+      'label' => t('Flash player'),
       'field types' => array('soundcloud'),
     ),
     'soundcloud_html5' => array(
-      'label'       => t('HTML5 player'),
+      'label' => t('HTML5 player'),
       'field types' => array('soundcloud'),
     ),
     'soundcloud_link' => array(
-      'label'       => t('Link'),
+      'label' => t('Link'),
       'field types' => array('soundcloud'),
     ),
   );
@@ -218,7 +218,7 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
   $element = array();
 
   // if player custom settings array is not available, use default settings 
-  if(!empty($instance['settings']['soundcloudplayer'])) {
+  if (!empty($instance['settings']['soundcloudplayer'])) {
     $settings = $instance['settings']['soundcloudplayer'];
   }
   else {
@@ -338,15 +338,15 @@ function soundcloudfield_field_widget_error($element, $error) {
   }
 }
 
-/*
+/**
  * Curl helper function
  */
 function soundcloudfield_curl_get($url) {
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-    $return = curl_exec($curl);
-    curl_close($curl);
-    return $return;
+  $curl = curl_init($url);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+  curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+  $return = curl_exec($curl);
+  curl_close($curl);
+  return $return;
 }
