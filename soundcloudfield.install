@@ -17,7 +17,7 @@ function soundcloudfield_field_schema($field) {
         'type' => 'varchar',
         'length' => 255,
         'not null' => FALSE,
-        'sortable' => TRUE
+        'sortable' => TRUE,
       ),
     ),
   );
