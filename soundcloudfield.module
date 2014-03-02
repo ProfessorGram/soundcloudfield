@@ -217,7 +217,9 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
  * Validate the field settings form.
  */
 function soundcloudfield_settings_form_validate($element, &$form_state, $complete_form) {
-  if (!empty($form_state['values']['instance']['settings']['soundcloudplayer']['width']) && ($form_state['values']['instance']['settings']['soundcloudplayer']['width'] < 1 || $form_state['values']['instance']['settings']['soundcloudplayer']['width'] > 100)) {
+  // Validate width.
+  $width = $form_state['values']['instance']['settings']['soundcloudplayer']['width'];
+  if (!empty($width) && ($width < 1 || $width > 100)) {
     form_set_error('instance][settings][soundcloudplayer][width', t('Player width must be a positive integer between 1-100'));
   }
 }
