@@ -433,6 +433,13 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
           else {
             $final_iframe = preg_replace('/">/', '&auto_play=' . $autoplay . '">', $final_iframe);
           }
+          // Show playcount?
+          if (preg_match('/show_playcount=(true|false)/', $final_iframe)) {
+            $final_iframe = preg_replace('/show_playcount=(true|false)/', 'show_playcount=' . $showplaycount, $final_iframe);
+          }
+          else {
+            $final_iframe = preg_replace('/">/', '&show_playcount=' . $showplaycount . '">', $final_iframe);
+          }
           // Show artwork?
           if (preg_match('/show_artwork=(true|false)/', $final_iframe)) {
             $final_iframe = preg_replace('/show_artwork=(true|false)/', 'show_artwork=' . $showartwork, $final_iframe);
