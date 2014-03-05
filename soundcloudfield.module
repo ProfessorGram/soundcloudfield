@@ -26,7 +26,7 @@ function soundcloudfield_field_info() {
       'instance_settings' => array(
         'width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH,
         'height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT,
-        'set_height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS,
+        'height_sets' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS,
         'autoplay' => FALSE,
         'showcomments' => FALSE,
         'showplaycount' => FALSE,
@@ -121,11 +121,11 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#required' => TRUE,
       '#element_validate' => array('element_validate_integer_positive'),
     );
-    $form['soundcloudplayer']['flash_player']['set_height'] = array(
+    $form['soundcloudplayer']['flash_player']['height_sets'] = array(
       '#type' => 'textfield',
       '#title' => t('Height for sets'),
       '#size' => 4,
-      '#default_value' => empty($settings['soundcloudplayer']['flash_player']['set_height']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS : $settings['soundcloudplayer']['flash_player']['set_height'],
+      '#default_value' => empty($settings['soundcloudplayer']['flash_player']['height_sets']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS : $settings['soundcloudplayer']['flash_player']['height_sets'],
       '#description' => t('Player height for sets. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS)),
       '#required' => TRUE,
       '#element_validate' => array('element_validate_integer_positive'),
@@ -371,7 +371,7 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
         }
         // Otherwise it's a set.
         else {
-          $height = $settings['flash_player']['set_height'];
+          $height = $settings['flash_player']['height_sets'];
           $params = 'url=' . $encoded_url .
                     '&amp;show_comments=' . $showcomments .
                     '&amp;auto_play=' . $autoplay .
