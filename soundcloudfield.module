@@ -391,8 +391,8 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
       $oembed_endpoint = 'http://soundcloud.com/oembed';
 
       // Get HTML5 player-specific settings.
-      $html5_player_height = $settings['html5_player']['html5_player_height'];
-      $html5_player_height_sets = $settings['html5_player']['html5_player_height_sets'];
+      $html5_player_height = (empty($settings['html5_player']['html5_player_height']) ? SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT : $settings['html5_player']['html5_player_height']);
+      $html5_player_height_sets = (empty($settings['html5_player']['html5_player_height_sets']) ? SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT_SETS : $settings['html5_player']['html5_player_height_sets']);
       $visual_player = ($display['settings']['player_type'] == 'visual' ? 'true' : 'false');
 
       foreach ($items as $delta => $item) {
