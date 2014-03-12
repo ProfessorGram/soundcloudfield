@@ -361,22 +361,22 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
 
         $splitted_url = explode("/", $parsed_url['path']);
 
-        // If this is a track..
-        if ($splitted_url[2] != 'sets') {
-          $height = $settings['flash_player']['height'];
-          $params = 'url=' . $encoded_url .
-                    '&amp;show_comments=' . $showcomments .
-                    '&amp;auto_play=' . $autoplay .
-                    '&amp;color=' . $color;
-        }
-        // Otherwise it's a set.
-        else {
+        // If this is an artist page, or a set.
+        if (!isset($splitted_url[2]) || $splitted_url[2] == 'sets') {
           $height = $settings['flash_player']['height_sets'];
           $params = 'url=' . $encoded_url .
                     '&amp;show_comments=' . $showcomments .
                     '&amp;auto_play=' . $autoplay .
                     '&amp;show_playcount=' . $showplaycount .
                     '&amp;show_artwork=' . $showartwork .
+                    '&amp;color=' . $color;
+        }
+        // Otherwise it's a track.
+        else {
+          $height = $settings['flash_player']['height'];
+          $params = 'url=' . $encoded_url .
+                    '&amp;show_comments=' . $showcomments .
+                    '&amp;auto_play=' . $autoplay .
                     '&amp;color=' . $color;
         }
 
@@ -408,8 +408,8 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
         else {
           $parsed_url = parse_url($item['url']);
           $splitted_url = explode("/", $parsed_url['path']);
-          // Track or set?
-          $iframe_height = ($splitted_url[2] != 'sets') ? $html5_player_height : $html5_player_height_sets;
+          // An artist page or a set or a track?
+          $iframe_height = (!isset($splitted_url[2]) || $splitted_url[2] == 'sets') ? $html5_player_height_sets : $html5_player_height;
         }
 
         // Create the URL
