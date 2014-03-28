@@ -1,5 +1,0 @@
-name = SoundCloud field
-description = Field for SoundCloud tracks and sets.
-core = 7.x
-dependencies[] = field
-package = SoundCloud
