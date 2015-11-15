@@ -8,8 +8,6 @@
  */
 
 define('SOUNDCLOUDFIELD_DEFAULT_WIDTH', 100);
-define('SOUNDCLOUDFIELD_DEFAULT_HEIGHT', 81);
-define('SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS', 305);
 define('SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT', 166);
 define('SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT_SETS', 450);
 // Usable sizes for visual player: 300, 450, 600.
@@ -25,10 +23,7 @@ function soundcloudfield_field_info() {
       'description' => t('This field stores a SoundCloud track or set URL.'),
       'instance_settings' => array(
         'width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH,
-        'height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT,
-        'height_sets' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS,
         'autoplay' => FALSE,
-        'showcomments' => FALSE,
         'showplaycount' => FALSE,
         'showartwork' => FALSE,
         'color' => 'ff7700',
@@ -38,7 +33,7 @@ function soundcloudfield_field_info() {
         'visual_player_height' => SOUNDCLOUDFIELD_DEFAULT_VISUAL_PLAYER_HEIGHT,
       ),
       'default_widget' => 'soundcloud_url',
-      'default_formatter' => 'soundcloud_default',
+      'default_formatter' => 'soundcloud_html5',
     ),
   );
 }
@@ -105,38 +100,6 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#element_validate' => array('element_validate_integer_positive'),
     );
 
-    // Flash player-only settings.
-    $form['soundcloudplayer']['flash_player'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('SoundCloud flash player-only settings'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    $form['soundcloudplayer']['flash_player']['height'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Height for tracks'),
-      '#size' => 4,
-      '#default_value' => empty($settings['soundcloudplayer']['flash_player']['height']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT : $settings['soundcloudplayer']['flash_player']['height'],
-      '#description' => t('Player height for tracks. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT)),
-      '#required' => TRUE,
-      '#element_validate' => array('element_validate_integer_positive'),
-    );
-    $form['soundcloudplayer']['flash_player']['height_sets'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Height for sets'),
-      '#size' => 4,
-      '#default_value' => empty($settings['soundcloudplayer']['flash_player']['height_sets']) ? SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS : $settings['soundcloudplayer']['flash_player']['height_sets'],
-      '#description' => t('Player height for sets. Default is @height.', array('@height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS)),
-      '#required' => TRUE,
-      '#element_validate' => array('element_validate_integer_positive'),
-    );
-    $form['soundcloudplayer']['flash_player']['showcomments'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Show comments'),
-      '#default_value' => empty($settings['soundcloudplayer']['flash_player']['showcomments']) ? FALSE : $settings['soundcloudplayer']['flash_player']['showcomments'],
-      '#description' => t('Show comments by default in the player.'),
-    );
-
     // HTML5 (classic) player-only settings.
     $form['soundcloudplayer']['html5_player'] = array(
       '#type' => 'fieldset',
@@ -144,6 +107,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
+
     $form['soundcloudplayer']['html5_player']['html5_player_height'] = array(
       '#type' => 'textfield',
       '#title' => t('Height for tracks'),
@@ -153,6 +117,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#required' => TRUE,
       '#element_validate' => array('element_validate_integer_positive'),
     );
+
     $form['soundcloudplayer']['html5_player']['html5_player_height_sets'] = array(
       '#type' => 'textfield',
       '#title' => t('Height for sets'),
@@ -170,6 +135,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
+
     $form['soundcloudplayer']['visual_player']['visual_player_height'] = array(
       '#type' => 'select',
       '#title' => t('Size of the visual player (height):'),
@@ -189,18 +155,21 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
       '#default_value' => empty($settings['soundcloudplayer']['autoplay']) ? FALSE : $settings['soundcloudplayer']['autoplay'],
       '#description' => t('Autoplay track or set.'),
     );
+
     $form['soundcloudplayer']['showplaycount'] = array(
       '#type' => 'checkbox',
       '#title' => t('Show play count'),
       '#default_value' => empty($settings['soundcloudplayer']['showplaycount']) ? FALSE : $settings['soundcloudplayer']['showplaycount'],
       '#description' => t('Show play count in player.'),
     );
+
     $form['soundcloudplayer']['showartwork'] = array(
       '#type' => 'checkbox',
       '#title' => t('Show artwork'),
       '#default_value' => empty($settings['soundcloudplayer']['showartwork']) ? FALSE : $settings['soundcloudplayer']['showartwork'],
       '#description' => t('Show artwork in player. Has no effect when using the visual player.'),
     );
+
     $form['soundcloudplayer']['color'] = array(
       '#type' => module_exists('jquery_colorpicker') ? 'jquery_colorpicker' : 'textfield',
       '#title' => t('Player color'),
@@ -263,11 +232,6 @@ function soundcloudfield_field_widget_form(&$form, &$form_state, $field, $instan
  */
 function soundcloudfield_field_formatter_info() {
   return array(
-    'soundcloud_default' => array(
-      'label' => t('Flash player'),
-      'field types' => array('soundcloud'),
-    ),
-
     'soundcloud_html5' => array(
       'label' => t('HTML5 player'),
       'field types' => array('soundcloud'),
@@ -349,44 +313,7 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
   $color = $settings['color'];
 
   switch ($display['type']) {
-    // Flash player case.
-    case 'soundcloud_default':
-      // Get the 'showcomment' setting for the flash player.
-      $showcomments = ($settings['flash_player']['showcomments']) ? 'true' : 'false';
-
-      foreach ($items as $delta => $item) {
-        $output = '';
-        $encoded_url = urlencode($item['url']);
-        $parsed_url = parse_url($item['url']);
-
-        $splitted_url = explode("/", $parsed_url['path']);
-
-        // If this is an artist page, or a set.
-        if (!isset($splitted_url[2]) || $splitted_url[2] == 'sets') {
-          $height = $settings['flash_player']['height_sets'];
-          $params = 'url=' . $encoded_url .
-                    '&amp;show_comments=' . $showcomments .
-                    '&amp;auto_play=' . $autoplay .
-                    '&amp;show_playcount=' . $showplaycount .
-                    '&amp;show_artwork=' . $showartwork .
-                    '&amp;color=' . $color;
-        }
-        // Otherwise it's a track.
-        else {
-          $height = $settings['flash_player']['height'];
-          $params = 'url=' . $encoded_url .
-                    '&amp;show_comments=' . $showcomments .
-                    '&amp;auto_play=' . $autoplay .
-                    '&amp;color=' . $color;
-        }
-
-        $output = '<object height="' . $height . '" width="' . $settings['width'] . '%"><param name="movie" value="https://player.' . $parsed_url['host'] . '/player.swf?' . $params . '"></param>';
-        $output .= '<param name="allowscriptaccess" value="always"></param><embed allowscriptaccess="always" height="' . $height . '" src="https://player.' . $parsed_url['host'] . '/player.swf?' . $params . '" type="application/x-shockwave-flash" width="' . $settings['width'] . '%"></embed></object>';
-
-        $element[$delta] = array('#markup' => $output);
-      }
-      break;
-    // HTML5 (classic+visual) player case.
+    // HTML5 (classic or visual) player case.
     case 'soundcloud_html5':
       $oembed_endpoint = 'http://soundcloud.com/oembed';
 

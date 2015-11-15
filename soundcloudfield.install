@@ -36,8 +36,8 @@ function soundcloudfield_update_7000() {
           if (!empty($instance['settings']['soundcloudplayer'])) {
             if (empty($instance['settings']['soundcloudplayer']['flash_player']) || !isset($instance['settings']['soundcloudplayer']['flash_player']['height']) || !isset($instance['settings']['soundcloudplayer']['flash_player']['height_sets']) || !isset($instance['settings']['soundcloudplayer']['flash_player']['showcomments'])) {
               $instance['settings']['soundcloudplayer']['flash_player'] = array(
-                'height' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT,
-                'height_sets' => SOUNDCLOUDFIELD_DEFAULT_HEIGHT_SETS,
+                'height' => 81,
+                'height_sets' => 305,
                 'showcomments' => 0,
               );
               $changed = TRUE;
@@ -60,6 +60,46 @@ function soundcloudfield_update_7000() {
           if ($changed) {
             field_update_instance($instance);
           }
+        }
+      }
+    }
+  }
+
+  field_cache_clear();
+  drupal_set_message(t('Field instances of type SoundCloud have been updated.'));
+}
+
+/**
+ * Remove Flash-player-specific settings from the field instances.
+ */
+function soundcloudfield_update_7001() {
+  $instances = field_info_instances();
+  foreach ($instances as $entity_type => $entities) {
+    foreach ($entities as $bundle => $fields) {
+      foreach ($fields as $field_name => $instance) {
+        $changed = FALSE;
+
+        if (in_array($instance['widget']['type'], array('soundcloud_url'))) {
+          if (isset($instance['settings']['soundcloudplayer']['flash_player'])) {
+            unset($instance['settings']['soundcloudplayer']['flash_player']);
+            $changed = TRUE;
+          }
+          if (isset($instance['settings']['height'])) {
+            unset($instance['settings']['height']);
+            $changed = TRUE;
+          }
+          if (isset($instance['settings']['height_sets'])) {
+            unset($instance['settings']['height_sets']);
+            $changed = TRUE;
+          }
+          if (isset($instance['settings']['showcomments'])) {
+            unset($instance['settings']['showcomments']);
+            $changed = TRUE;
+          }
+        }
+
+        if ($changed) {
+          field_update_instance($instance);
         }
       }
     }
