@@ -47,23 +47,23 @@ class SoundCloudLinkFormatter extends FormatterBase {
 
     $elements['trim_length'] = array(
       '#type' => 'number',
-      '#title' => t('Trim link text length'),
-      '#field_suffix' => t('characters'),
+      '#title' => $this->t('Trim link text length'),
+      '#field_suffix' => $this->t('characters'),
       '#default_value' => $this->getSetting('trim_length'),
       '#min' => 1,
-      '#description' => t('Leave blank to allow unlimited link text lengths.'),
+      '#description' => $this->t('Leave blank to allow unlimited link text lengths.'),
     );
 
     $elements['rel'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Add rel="nofollow" to links'),
+      '#title' => $this->t('Add rel="nofollow" to links'),
       '#return_value' => 'nofollow',
       '#default_value' => $this->getSetting('rel'),
     );
 
     $elements['target'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Open link in new window'),
+      '#title' => $this->t('Open link in new window'),
       '#return_value' => '_blank',
       '#default_value' => $this->getSetting('target'),
     );
@@ -78,20 +78,20 @@ class SoundCloudLinkFormatter extends FormatterBase {
     $summary = array();
     $settings = $this->getSettings();
 
-    $summary[] = t('Displays the SoundCloud link.');
+    $summary[] = $this->t('Displays the SoundCloud link.');
 
     if (!empty($settings['trim_length'])) {
-      $summary[] = t('Link text trimmed to @limit characters', array('@limit' => $settings['trim_length']));
+      $summary[] = $this->t('Link text trimmed to @limit characters', array('@limit' => $settings['trim_length']));
     }
     else {
-      $summary[] = t('Link text not trimmed');
+      $summary[] = $this->t('Link text not trimmed');
     }
 
     if (!empty($settings['rel'])) {
-      $summary[] = t('Add rel="@rel"', array('@rel' => $settings['rel']));
+      $summary[] = $this->t('Add rel="@rel"', array('@rel' => $settings['rel']));
     }
     if (!empty($settings['target'])) {
-      $summary[] = t('Open link in new window');
+      $summary[] = $this->t('Open link in new window');
     }
 
     return $summary;

@@ -51,8 +51,8 @@ class SoundCloudDefaultFormatter extends FormatterBase {
     $elements = parent::settingsForm($form, $form_state);
 
     $elements['soundcloud_player_type'] = array(
-      '#title' => t('HTML5 player type'),
-      '#description' => t('Select which HTML5 player to use.'),
+      '#title' => $this->t('HTML5 player type'),
+      '#description' => $this->t('Select which HTML5 player to use.'),
       '#type' => 'select',
       '#default_value' => $this->getSetting('soundcloud_player_type'),
       '#options' => array(
@@ -63,15 +63,15 @@ class SoundCloudDefaultFormatter extends FormatterBase {
 
     $elements['soundcloud_player_width'] = array(
       '#type' => 'textfield',
-      '#title' => t('Width'),
+      '#title' => $this->t('Width'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_width'),
-      '#description' => t('Player width in percent. Default is @width.', array('@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH)),
+      '#description' => $this->t('Player width in percent. Default is @width.', array('@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH)),
     );
 
     $elements['soundcloud_player_height'] = array(
       '#type' => 'textfield',
-      '#title' => t('Height'),
+      '#title' => $this->t('Height'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_height'),
       '#states' => array(
@@ -83,7 +83,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
 
     $elements['soundcloud_player_height_sets'] = array(
       '#type' => 'textfield',
-      '#title' => t('Height for sets'),
+      '#title' => $this->t('Height for sets'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_height_sets'),
       '#states' => array(
@@ -95,7 +95,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
 
     $elements['soundcloud_player_visual_height'] = array(
       '#type' => 'select',
-      '#title' => t('Height of the visual player'),
+      '#title' => $this->t('Height of the visual player'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_visual_height'),
       '#options' => array(
@@ -112,38 +112,38 @@ class SoundCloudDefaultFormatter extends FormatterBase {
 
     $elements['soundcloud_player_autoplay'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Play audio automatically when loaded (autoplay).'),
+      '#title' => $this->t('Play audio automatically when loaded (autoplay).'),
       '#default_value' => $this->getSetting('soundcloud_player_autoplay'),
     );
 
     $elements['soundcloud_player_color'] = array(
       '#type' => 'textfield',
-      '#title' => t('Player color.'),
+      '#title' => $this->t('Player color.'),
       '#default_value' => $this->getSetting('soundcloud_player_color'),
-      '#description' => t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
+      '#description' => $this->t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
     );
 
     $elements['soundcloud_player_hiderelated'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Hide raleted tracks.'),
+      '#title' => $this->t('Hide raleted tracks.'),
       '#default_value' => $this->getSetting('soundcloud_player_hiderelated'),
     );
 
     $elements['soundcloud_player_showartwork'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Show artwork.'),
+      '#title' => $this->t('Show artwork.'),
       '#default_value' => $this->getSetting('soundcloud_player_showartwork'),
     );
 
     $elements['soundcloud_player_showcomments'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Show comments.'),
+      '#title' => $this->t('Show comments.'),
       '#default_value' => $this->getSetting('soundcloud_player_showcomments'),
     );
 
     $elements['soundcloud_player_showplaycount'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Show play count.'),
+      '#title' => $this->t('Show play count.'),
       '#default_value' => $this->getSetting('soundcloud_player_showplaycount'),
     );
 
@@ -157,7 +157,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
     $summary = array();
     $settings = $this->getSettings();
 
-    $summary[] = t('Displays the SoundCloud player.');
+    $summary[] = $this->t('Displays the SoundCloud player.');
 
     return $summary;
   }
@@ -262,7 +262,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
         $output = html_entity_decode($final_iframe);
       }
       else {
-        $output = t('The SoundCloud content at !url is not available, or it is set to private.', array('!url' => l($item['url'], $item['url'])));
+        $output = $this->t('The SoundCloud content at !url is not available, or it is set to private.', array('!url' => l($item['url'], $item['url'])));
       }
 
       // Extract field item attributes for the theme function, and unset them

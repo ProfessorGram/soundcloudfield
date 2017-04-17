@@ -48,7 +48,7 @@ class SoundCloudWidget extends WidgetBase {
     // Build the element render array.
     $element['url'] = array(
       '#type' => 'url', // investigate, other types? (textfield)
-      '#title' => t('SoundCloud URL'),
+      '#title' => $this->t('SoundCloud URL'),
       '#placeholder' => $this->getSetting('placeholder_url'), // investigate
       '#default_value' => isset($item->url) ? $item->url : NULL,
       '#element_validate' => array(array(get_called_class(), 'validateSoundCloudUriElement')),
@@ -73,9 +73,9 @@ class SoundCloudWidget extends WidgetBase {
 
     $elements['placeholder_url'] = array(
       '#type' => 'textfield',
-      '#title' => t('Placeholder for URL'),
+      '#title' => $this->t('Placeholder for URL'),
       '#default_value' => $this->getSetting('placeholder_url'),
-      '#description' => t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
+      '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
     );
 
     return $elements;
@@ -89,11 +89,11 @@ class SoundCloudWidget extends WidgetBase {
 
     $placeholder_url = $this->getSetting('placeholder_url');
     if (empty($placeholder_url)) {
-      $summary[] = t('No placeholders');
+      $summary[] = $this->t('No placeholders');
     }
     else {
       if (!empty($placeholder_url)) {
-        $summary[] = t('URL placeholder: @placeholder_url', array('@placeholder_url' => $placeholder_url));
+        $summary[] = $this->t('URL placeholder: @placeholder_url', array('@placeholder_url' => $placeholder_url));
       }
     }
 

@@ -84,7 +84,7 @@ class SoundCloudItem extends FieldItemBase {
       'url' => array(
         'Length' => array(
           'max' => $max_length,
-          'maxMessage' => t('%name: the SoundCloud URL may not be longer than @max characters.', array('%name' => $this->getFieldDefinition()->getLabel(), '@max' => $max_length)),
+          'maxMessage' => $this->t('%name: the SoundCloud URL may not be longer than @max characters.', array('%name' => $this->getFieldDefinition()->getLabel(), '@max' => $max_length)),
         )
       ),
     ));
