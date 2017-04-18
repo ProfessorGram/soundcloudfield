@@ -262,7 +262,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
         $output = html_entity_decode($final_iframe);
       }
       else {
-        $output = $this->t('The SoundCloud content at !url is not available, or it is set to private.', array('!url' => l($item['url'], $item['url'])));
+        $output = $this->t('The SoundCloud content at <a href=":url">:url</a> is not available, or it is set to private.', [':url' => $item->url]);
       }
 
       // Extract field item attributes for the theme function, and unset them
