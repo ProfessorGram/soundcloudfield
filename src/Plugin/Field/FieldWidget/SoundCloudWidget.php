@@ -31,12 +31,12 @@ class SoundCloudWidget extends WidgetBase {
    */
   public static function defaultSettings() {
     // todo: investigate
-    $settings = parent::defaultSettings();
+    // $settings = parent::defaultSettings();
 
-    return array(
+    return [
       'url' => '',
       'placeholder_url' => '',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -51,10 +51,14 @@ class SoundCloudWidget extends WidgetBase {
       '#title' => $this->t('SoundCloud URL'),
       '#placeholder' => $this->getSetting('placeholder_url'), // investigate
       '#default_value' => isset($item->url) ? $item->url : NULL,
-      '#element_validate' => array(array(get_called_class(), 'validateSoundCloudUriElement')),
+      '#element_validate' => [[get_called_class(), 'validateSoundCloudUriElement']],
       '#maxlength' => 2048,
       '#required' => $element['#required'],
     );
+
+    if (empty($element['url']['#description'])) {
+      $element['url']['#description'] = $this->t('Enter the SoundCloud URL. A valid example: https://soundcloud.com/archives-5/purl-form-is-emptiness.');
+    }
 
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == 1) {
       $element += array(
@@ -101,11 +105,14 @@ class SoundCloudWidget extends WidgetBase {
   }
 
   /**
-   * Form element validation handler for ...().
+   * Form element validation handler for the 'url' element.
    */
-  function validateSoundCloudUriElement(&$element, FormStateInterface $form_state, $form) {
+  public static function validateSoundCloudUriElement($element, FormStateInterface $form_state, $form) {
     $input = $element['#value'];
 
+    if (!empty($input) && !preg_match('@^https?://soundcloud\.com/([^"\&]+)@i', $input, $matches)) {
+      $form_state->setError($element, t('Please provide a valid SoundCloud URL.'));
+    }
   }
 
 }
