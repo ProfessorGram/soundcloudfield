@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\soundcloudfield\Plugin\Field\FieldWidget\SoundCloudWidget.
- */
-
 namespace Drupal\soundcloudfield\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;

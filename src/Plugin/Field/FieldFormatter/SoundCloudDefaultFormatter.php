@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\soundcloudfield\Plugin\Field\FieldFormatter\SoundCloudDefaultFormatter.
- */
-
 namespace Drupal\soundcloudfield\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\soundcloudfield\Plugin\Field\FieldFormatter\SoundCloudLinkFormatter.
- */
-
 namespace Drupal\soundcloudfield\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\soundcloudfield\Plugin\Field\FieldType\SoundCloudItem.
- */
-
 namespace Drupal\soundcloudfield\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
