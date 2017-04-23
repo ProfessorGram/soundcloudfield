@@ -120,7 +120,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
 
     $elements['soundcloud_player_hiderelated'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Hide raleted tracks.'),
+      '#title' => $this->t('Hide related tracks.'),
       '#default_value' => $this->getSetting('soundcloud_player_hiderelated'),
     );
 

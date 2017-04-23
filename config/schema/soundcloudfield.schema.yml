@@ -61,7 +61,7 @@ field.formatter.settings.soundcloud_default:
       label: 'Player color.'
     soundcloud_player_hiderelated:
       type: boolean
-      label: 'Hide raleted tracks.'
+      label: 'Hide related tracks.'
     soundcloud_player_showartwork:
       type: boolean
       label: 'Show artwork.'
