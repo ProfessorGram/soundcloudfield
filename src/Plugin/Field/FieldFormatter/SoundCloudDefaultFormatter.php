@@ -199,7 +199,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
       }
 
       // Create the URL.
-      $oembed_url = $oembed_endpoint . '?iframe=true&url=' . ($encoded_url);
+      $oembed_url = $oembed_endpoint . '?iframe=true&format=json&url=' . ($encoded_url);
 
       // curl get.
       $soundcloud_curl_get = _soundcloudfield_curl_get($oembed_url);
