@@ -4,7 +4,8 @@ namespace Drupal\soundcloudfield\Tests;
 use Drupal\simpletest\WebTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\Display\EntityDisplayRepositoryInterface;
 
 /**
  * Test case for custom time field
@@ -136,7 +137,7 @@ class SoundCloudWidgetValidationTest extends WebTestBase {
    * Get the field for the test with default settings.
    */
   private function getField() {
-    $this->fieldName = Unicode::strtolower($this->randomMachineName());
+    $this->fieldName = mb_strtolower($this->randomMachineName());
     //db field
     $this->fieldStorage = FieldStorageConfig::create([
                                                        'field_name'  => $this->fieldName,
@@ -156,14 +157,14 @@ class SoundCloudWidgetValidationTest extends WebTestBase {
     $this->field->save();
 
     //form display
-    entity_get_form_display('entity_test', 'entity_test', 'default')
+    EntityStorageInterface::load('entity_test.entity_test.default')
       ->setComponent($this->fieldName,
                      [
                        'type' => 'soundcloud_url',
                      ])
       ->save();
     //display
-    entity_get_display('entity_test', 'entity_test', 'full')
+    EntityDisplayRepositoryInterface::getViewDisplay('entity_test', 'entity_test', 'full')
       ->setComponent($this->fieldName,
                      [
                        'type'     => 'soundcloud_default',
