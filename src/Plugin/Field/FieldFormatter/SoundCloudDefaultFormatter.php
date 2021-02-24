@@ -173,7 +173,7 @@ class SoundCloudDefaultFormatter extends FormatterBase {
     $color = $this->getSetting('soundcloud_player_color') ? $this->getSetting('soundcloud_player_color') : 'ff7700';
 
     //
-    $oembed_endpoint = 'http://soundcloud.com/oembed';
+    $oembed_endpoint = 'https://soundcloud.com/oembed';
 
     // Get 'HTML5 player'-specific settings.
     $html5_player_height = (empty($settings['html5_player']['html5_player_height']) ? SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT : $settings['html5_player']['html5_player_height']);
