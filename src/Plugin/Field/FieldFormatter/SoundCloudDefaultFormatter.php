@@ -2,6 +2,7 @@
 
 namespace Drupal\soundcloudfield\Plugin\Field\FieldFormatter;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -198,19 +199,19 @@ class SoundCloudDefaultFormatter extends FormatterBase {
       }
 
       // Create the URL.
-      $oembed_url = $oembed_endpoint . '?iframe=true&url=' . ($encoded_url);
+      $oembed_url = $oembed_endpoint . '?iframe=true&format=json&url=' . ($encoded_url);
 
       // curl get.
       $soundcloud_curl_get = _soundcloudfield_curl_get($oembed_url);
 
       if ($soundcloud_curl_get != ' ') {
         // Load in the oEmbed XML.
-        $oembed = simplexml_load_string($soundcloud_curl_get);
+        $oembed = Json::decode($soundcloud_curl_get);
 
         // Replace player default settings with our settings,
         // set player width and height first.
-        $final_iframe = preg_replace('/(width=)"([^"]+)"/', 'width="' . $width . '%"', $oembed->html);
-        $final_iframe = preg_replace('/(height=)"([^"]+)"/', 'height="' . $iframe_height . '"', $oembed->html);
+        $final_iframe = preg_replace('/(width=)"([^"]+)"/', 'width="' . $width . '%"', $oembed['html']);
+        $final_iframe = preg_replace('/(height=)"([^"]+)"/', 'height="' . $iframe_height . '"', $oembed['html']);
         // Set autoplay.
         if (preg_match('/auto_play=(true|false)/', $final_iframe)) {
           $final_iframe = preg_replace('/auto_play=(true|false)/', 'auto_play=' . $autoplay, $final_iframe);
