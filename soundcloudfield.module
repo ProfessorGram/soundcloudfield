@@ -264,6 +264,7 @@ function soundcloudfield_field_widget_form(&$form, &$form_state, $field, $instan
     $element['url'] = array(
       '#type' => 'textfield',
       '#default_value' => isset($items[$delta]['url']) ? $items[$delta]['url'] : NULL,
+      '#size' => 120,
       '#maxlength' => 255,
     ) + $base;
   }
