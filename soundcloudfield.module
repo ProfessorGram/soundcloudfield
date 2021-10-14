@@ -34,8 +34,51 @@ function soundcloudfield_field_info() {
       ),
       'default_widget' => 'soundcloud_url',
       'default_formatter' => 'soundcloud_html5',
+      // Support hook_entity_property_info() from contrib "Entity API".
+      'property_type' => 'soundcloudfield',
+      'property_callbacks' => array('soundcloudfield_property_info_callback'),
     ),
   );
+}
+
+ /**
+ * Callback to alter the property info of soundcloudfield fields.
+ *
+ * @see soundcloudfield_field_info()
+ */
+function soundcloudfield_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = $field['field_name'];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+
+  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  $property['auto creation'] = 'soundcloudfield_auto_creation';
+  $property['property info'] = soundcloudfield_data_property_info();
+
+  unset($property['query callback']);
+}
+
+/**
+ * Callback for creating a new, empty soundcloudfield field item.
+ *
+ * @see soundcloudfield_property_info_callback()
+ */
+function soundcloudfield_auto_creation() {
+  return array('url' => NULL);
+}
+
+/**
+ * Defines info for the properties of the soundcloudfield field data structure.
+ */
+function soundcloudfield_data_property_info() {
+  $properties['url'] = array(
+    'type' => 'uri',
+    'label' => t('The URL of the soundcloud link.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'getter callback' => 'entity_property_verbatim_get',
+  );
+
+  return $properties;
 }
 
 /**
@@ -298,13 +341,12 @@ function soundcloudfield_field_formatter_settings_summary($field, $instance, $vi
 function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
 
-  // if player custom settings array is not available, use default settings 
+  // if player custom settings array is not available, use default settings
   if (!empty($instance['settings']['soundcloudplayer'])) {
     $settings = $instance['settings']['soundcloudplayer'];
   }
   else {
     $settings = $instance['settings'];
-    watchdog('soundcloudfield', 'Instance settings array is missing. Falling back to default player settings.', NULL, WATCHDOG_WARNING);
   }
 
   // Get the "common" settings.
