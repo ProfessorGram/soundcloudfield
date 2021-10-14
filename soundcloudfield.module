@@ -470,6 +470,17 @@ function soundcloudfield_curl_get($url) {
   $curl = curl_init($url);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+
+  // Check the Drupal proxy server settings, see if they are correct.
+  if (variable_get('proxy_server', FALSE)) {
+    curl_setopt($curl, CURLOPT_PROXY, variable_get('proxy_server'));
+    curl_setopt($curl, CURLOPT_PROXYPORT, variable_get('proxy_port', '8080'));
+
+    if (variable_get('proxy_username', FALSE) && variable_get('proxy_password', FALSE)) {
+      curl_setopt($curl, CURLOPT_PROXYUSERPWD, variable_get('proxy_username') . ':' . variable_get('proxy_password'));
+    }
+  }
+
   if (variable_get('soundcloudfield_curl_followlocation', FALSE)) {
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
   }
