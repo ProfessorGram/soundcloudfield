@@ -2,10 +2,15 @@
 
 namespace Drupal\soundcloudfield\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'soundcloud_default' formatter.
@@ -19,7 +24,57 @@ use Drupal\Core\Form\FormStateInterface;
  *   }
  * )
  */
-class SoundCloudDefaultFormatter extends FormatterBase {
+class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The HTTP client to fetch the feed data with.
+   *
+   * @var \GuzzleHttp\ClientInterface
+   */
+  protected $httpClient;
+
+  /**
+   * Constructs a SoundCloudDefaultFormatter object.
+   *
+   * @param string $plugin_id
+   *   The plugin_id for the formatter.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the formatter is associated.
+   * @param array $settings
+   *   The formatter settings.
+   * @param string $label
+   *   The formatter label display setting.
+   * @param string $view_mode
+   *   The view mode.
+   * @param array $third_party_settings
+   *   Any third party settings.
+   * @param \GuzzleHttp\ClientInterface $http_client
+   *   The Guzzle HTTP client.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, ClientInterface $http_client) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+
+    $this->httpClient = $http_client;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    // @see \Drupal\Core\Field\FormatterPluginManager::createInstance().
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['label'],
+      $configuration['view_mode'],
+      $configuration['third_party_settings'],
+      $container->get('http_client')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -173,7 +228,6 @@ class SoundCloudDefaultFormatter extends FormatterBase {
     $showartwork = $this->getSetting('soundcloud_player_showartwork') ? 'true' : 'false';
     $color = $this->getSetting('soundcloud_player_color') ? $this->getSetting('soundcloud_player_color') : 'ff7700';
 
-    //
     $oembed_endpoint = 'https://soundcloud.com/oembed';
 
     // Get 'HTML5 player'-specific settings.
@@ -201,12 +255,10 @@ class SoundCloudDefaultFormatter extends FormatterBase {
       // Create the URL.
       $oembed_url = $oembed_endpoint . '?iframe=true&format=json&url=' . ($encoded_url);
 
-      // curl get.
-      $soundcloud_curl_get = _soundcloudfield_curl_get($oembed_url);
-
-      if ($soundcloud_curl_get != ' ') {
-        // Load in the oEmbed XML.
-        $oembed = Json::decode($soundcloud_curl_get);
+      // Fetching data.
+      if ($soundcloud_embed_data = $this->fetchSoundCloudData($oembed_url)) {
+        // Load in the oEmbed JSON.
+        $oembed = Json::decode($soundcloud_embed_data);
 
         // Replace player default settings with our settings,
         // set player width and height first.
@@ -271,14 +323,27 @@ class SoundCloudDefaultFormatter extends FormatterBase {
         '#markup' => $output,
         '#allowed_tags' => ['iframe'],
       );
-
-//      $elements[$delta] = array(
-//        '#markup' => $item->value,
-//        '#markup' => $item->processed,
-//      );
     }
 
     return $elements;
+  }
+
+  /**
+   * Get data by url used httpClient.
+   */
+  public function fetchSoundCloudData($url) {
+    try {
+      $response = $this->httpClient->get($url);
+      $data = (string) $response->getBody();
+      if (empty($data)) {
+        return FALSE;
+      }
+    }
+    catch (RequestException $e) {
+      return FALSE;
+    }
+
+    return $data;
   }
 
   protected function renderEmbedCode($track_id, $width, $height, $autoplay) {
