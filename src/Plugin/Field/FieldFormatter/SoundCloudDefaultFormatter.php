@@ -11,6 +11,8 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 
 /**
  * Plugin implementation of the 'soundcloud_default' formatter.
@@ -307,7 +309,8 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
         $output = html_entity_decode($final_iframe);
       }
       else {
-        $output = $this->t('The SoundCloud content at <a href=":url">:url</a> is not available, or it is set to private.', [':url' => $item->url]);
+        $soundcloud_url = Url::fromUri($item->url)->toString();
+        $output = $this->t('The SoundCloud content at <a href=":url">:url</a> is not available, or it is set to private.', [':url' => $soundcloud_url]);
       }
 
       // Extract field item attributes for the theme function, and unset them
