@@ -8,13 +8,13 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\Display\EntityDisplayRepositoryInterface;
 
 /**
- * Test case for custom time field
+ * Test case for custom SoundCloud field.
  *
  * @group soundcloudfield
  */
 class SoundCloudWidgetValidationTest extends WebTestBase {
   /**
-   * Modules to install
+   * Modules to install.
    *
    * @var array
    */
@@ -22,7 +22,7 @@ class SoundCloudWidgetValidationTest extends WebTestBase {
 
 
   /**
-   * Random fieldName
+   * Random fieldName.
    */
   protected $fieldName;
 
@@ -40,19 +40,22 @@ class SoundCloudWidgetValidationTest extends WebTestBase {
    */
   protected $field;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $this->drupalLogin($this->drupalCreateUser([
-                                                 'view test entity',
-                                                 'administer entity_test content',
-                                                 'link to any page',
-                                               ]));
+      'view test entity',
+      'administer entity_test content',
+      'link to any page',
+    ]));
   }
 
   /**
-   * Test an a valid SoundCloud URL
+   * Test for valid SoundCloud URL.
    */
-  function testSoundCloudUrlValid() {
+  public function testSoundCloudUrlValid() {
     $field = $this->getField();
 
     // Display creation form.
@@ -72,9 +75,9 @@ class SoundCloudWidgetValidationTest extends WebTestBase {
   }
 
   /**
-   * Test an invalid URLs or strings
+   * Test for invalid URLs or strings.
    */
-  function testSoundCloudUrlInvalid() {
+  public function testSoundCloudUrlInvalid() {
     $field = $this->getField();
 
     // Display creation form.
@@ -138,50 +141,51 @@ class SoundCloudWidgetValidationTest extends WebTestBase {
    */
   private function getField() {
     $this->fieldName = mb_strtolower($this->randomMachineName());
-    //db field
+    // DB field.
     $this->fieldStorage = FieldStorageConfig::create([
-                                                       'field_name'  => $this->fieldName,
-                                                       'entity_type' => 'entity_test',
-                                                       'type'        => 'soundcloud',
-                                                       'cardinality' => 1,
-                                                     ]);
+      'field_name'  => $this->fieldName,
+      'entity_type' => 'entity_test',
+      'type'        => 'soundcloud',
+      'cardinality' => 1,
+    ]);
     $this->fieldStorage->save();
-    //field type
+    // Field type.
     $this->field = FieldConfig::create([
-                                         'field_storage' => $this->fieldStorage,
-                                         'bundle'        => 'entity_test',
-                                         'settings'      => [
-                                           'title' => DRUPAL_DISABLED,
-                                         ],
-                                       ]);
+      'field_storage' => $this->fieldStorage,
+      'bundle'        => 'entity_test',
+      'settings'      => [
+        'title' => DRUPAL_DISABLED,
+      ],
+    ]);
     $this->field->save();
 
-    //form display
+    // Form display.
     EntityStorageInterface::load('entity_test.entity_test.default')
       ->setComponent($this->fieldName,
-                     [
-                       'type' => 'soundcloud_url',
-                     ])
+        [
+          'type' => 'soundcloud_url',
+        ])
       ->save();
-    //display
+
+    // Display.
     EntityDisplayRepositoryInterface::getViewDisplay('entity_test', 'entity_test', 'full')
       ->setComponent($this->fieldName,
-                     [
-                       'type'     => 'soundcloud_default',
-                       'settings' => [
-                         'soundcloud_player_type'          => 'classic',
-                         'soundcloud_player_width'         => 100,
-                         'soundcloud_player_height'        => 166,
-                         'soundcloud_player_height_sets'   => 450,
-                         'soundcloud_player_visual_height' => 450,
-                         'soundcloud_player_autoplay'      => '',
-                         'soundcloud_player_color'         => 'ff7700',
-                         'soundcloud_player_hiderelated'   => '',
-                         'soundcloud_player_showartwork'   => '',
-                         'soundcloud_player_showcomments'  => TRUE,
-                         'soundcloud_player_showplaycount' => '',
-                       ],
-                     ])
+        [
+          'type' => 'soundcloud_default',
+          'settings' => [
+            'soundcloud_player_type' => 'classic',
+            'soundcloud_player_width' => 100,
+            'soundcloud_player_height' => 166,
+            'soundcloud_player_height_sets' => 450,
+            'soundcloud_player_visual_height' => 450,
+            'soundcloud_player_autoplay' => '',
+            'soundcloud_player_color' => 'ff7700',
+            'soundcloud_player_hiderelated' => '',
+            'soundcloud_player_showartwork' => '',
+            'soundcloud_player_showcomments' => TRUE,
+            'soundcloud_player_showplaycount' => '',
+          ],
+        ])
       ->save();
   }
 }

@@ -80,7 +80,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'soundcloud_player_type' => 'classic',
       'soundcloud_player_width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH,
       'soundcloud_player_height' => SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT,
@@ -92,7 +92,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
       'soundcloud_player_showartwork' => '',
       'soundcloud_player_showcomments' => TRUE,
       'soundcloud_player_showplaycount' => '',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -101,102 +101,102 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = parent::settingsForm($form, $form_state);
 
-    $elements['soundcloud_player_type'] = array(
+    $elements['soundcloud_player_type'] = [
       '#title' => $this->t('HTML5 player type'),
       '#description' => $this->t('Select which HTML5 player to use.'),
       '#type' => 'select',
       '#default_value' => $this->getSetting('soundcloud_player_type'),
-      '#options' => array(
-        'classic' => 'Classic',
-        'visual' => 'Visual Player (new)',
-      ),
-    );
+      '#options' => [
+        'classic' => t('Classic'),
+        'visual' => t('Visual Player (new)'),
+      ],
+    ];
 
-    $elements['soundcloud_player_width'] = array(
+    $elements['soundcloud_player_width'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Width'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_width'),
-      '#description' => $this->t('Player width in percent. Default is @width.', array('@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH)),
-    );
+      '#description' => $this->t('Player width in percent. Default is @width.', ['@width' => SOUNDCLOUDFIELD_DEFAULT_WIDTH]),
+    ];
 
-    $elements['soundcloud_player_height'] = array(
+    $elements['soundcloud_player_height'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Height'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_height'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name*="soundcloud_player_type"]' => array('value' => 'classic'),
-        ),
-      ),
-    );
+      '#states' => [
+        'visible' => [
+          ':input[name*="soundcloud_player_type"]' => ['value' => 'classic'],
+        ],
+      ],
+    ];
 
-    $elements['soundcloud_player_height_sets'] = array(
+    $elements['soundcloud_player_height_sets'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Height for sets'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_height_sets'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name*="soundcloud_player_type"]' => array('value' => 'classic'),
-        ),
-      ),
-    );
+      '#states' => [
+        'visible' => [
+          ':input[name*="soundcloud_player_type"]' => ['value' => 'classic'],
+        ],
+      ],
+    ];
 
-    $elements['soundcloud_player_visual_height'] = array(
+    $elements['soundcloud_player_visual_height'] = [
       '#type' => 'select',
       '#title' => $this->t('Height of the visual player'),
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_visual_height'),
-      '#options' => array(
-        300 => '300px',
-        450 => '450px',
-        600 => '600px',
-      ),
-      '#states' => array(
-        'visible' => array(
-          ':input[name*="soundcloud_player_type"]' => array('value' => 'visual'),
-        ),
-      ),
-    );
+      '#options' => [
+        300 => t('300px'),
+        450 => t('450px'),
+        600 => t('600px'),
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name*="soundcloud_player_type"]' => ['value' => 'visual'],
+        ],
+      ],
+    ];
 
-    $elements['soundcloud_player_autoplay'] = array(
+    $elements['soundcloud_player_autoplay'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Play audio automatically when loaded (autoplay).'),
       '#default_value' => $this->getSetting('soundcloud_player_autoplay'),
-    );
+    ];
 
-    $elements['soundcloud_player_color'] = array(
+    $elements['soundcloud_player_color'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Player color.'),
       '#default_value' => $this->getSetting('soundcloud_player_color'),
       '#description' => $this->t('Player color in hexadecimal format. Default is ff7700. Turn on the jQuery Colorpicker module if available.'),
-    );
+    ];
 
-    $elements['soundcloud_player_hiderelated'] = array(
+    $elements['soundcloud_player_hiderelated'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Hide related tracks.'),
       '#default_value' => $this->getSetting('soundcloud_player_hiderelated'),
-    );
+    ];
 
-    $elements['soundcloud_player_showartwork'] = array(
+    $elements['soundcloud_player_showartwork'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show artwork.'),
       '#default_value' => $this->getSetting('soundcloud_player_showartwork'),
-    );
+    ];
 
-    $elements['soundcloud_player_showcomments'] = array(
+    $elements['soundcloud_player_showcomments'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show comments.'),
       '#default_value' => $this->getSetting('soundcloud_player_showcomments'),
-    );
+    ];
 
-    $elements['soundcloud_player_showplaycount'] = array(
+    $elements['soundcloud_player_showplaycount'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show play count.'),
       '#default_value' => $this->getSetting('soundcloud_player_showplaycount'),
-    );
+    ];
 
     return $elements;
   }
@@ -205,11 +205,8 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = array();
-    $settings = $this->getSettings();
-
+    $summary = [];
     $summary[] = $this->t('Displays the SoundCloud player.');
-
     return $summary;
   }
 
@@ -217,7 +214,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = array();
+    $elements = [];
     $settings = $this->getSettings();
 
     // Get the "common" settings.
@@ -319,17 +316,17 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
       unset($item->_attributes);
 
       // Render each element as markup.
-      $elements[$delta] = array(
+      $elements[$delta] = [
         '#markup' => $output,
         '#allowed_tags' => ['iframe'],
-      );
+      ];
     }
 
     return $elements;
   }
 
   /**
-   * Get data by url used httpClient.
+   * Get data from url using httpClient.
    */
   public function fetchSoundCloudData($url) {
     try {
@@ -345,19 +342,4 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
 
     return $data;
   }
-
-  protected function renderEmbedCode($track_id, $width, $height, $autoplay) {
-    return [
-      '#type' => 'html_tag',
-      '#tag' => 'iframe',
-      '#attributes' => [
-        'width' => $width,
-        'height' => $height,
-        'frameborder' => '0',
-        'allowfullscreen' => 'allowfullscreen',
-        'src' => sprintf('https://w.soundcloud.com/player/%s?autoplay=%s', $track_id, $autoplay),
-      ],
-    ];
-  }
-
 }

@@ -21,17 +21,17 @@ use Drupal\Core\Url;
  * )
  */
 class SoundCloudLinkFormatter extends FormatterBase {
-  // investigate: extends UriLinkFormatter
+  // @todo Investigate using extends UriLinkFormatter.
 
   /**
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'trim_length' => '80',
       'rel' => '',
       'target' => '',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -40,28 +40,28 @@ class SoundCloudLinkFormatter extends FormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = parent::settingsForm($form, $form_state);
 
-    $elements['trim_length'] = array(
+    $elements['trim_length'] = [
       '#type' => 'number',
       '#title' => $this->t('Trim link text length'),
       '#field_suffix' => $this->t('characters'),
       '#default_value' => $this->getSetting('trim_length'),
       '#min' => 1,
       '#description' => $this->t('Leave blank to allow unlimited link text lengths.'),
-    );
+    ];
 
-    $elements['rel'] = array(
+    $elements['rel'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Add rel="nofollow" to links'),
       '#return_value' => 'nofollow',
       '#default_value' => $this->getSetting('rel'),
-    );
+    ];
 
-    $elements['target'] = array(
+    $elements['target'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Open link in new window'),
       '#return_value' => '_blank',
       '#default_value' => $this->getSetting('target'),
-    );
+    ];
 
     return $elements;
   }
@@ -70,20 +70,20 @@ class SoundCloudLinkFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = array();
+    $summary = [];
     $settings = $this->getSettings();
 
     $summary[] = $this->t('Displays the SoundCloud link.');
 
     if (!empty($settings['trim_length'])) {
-      $summary[] = $this->t('Link text trimmed to @limit characters', array('@limit' => $settings['trim_length']));
+      $summary[] = $this->t('Link text trimmed to @limit characters', ['@limit' => $settings['trim_length']]);
     }
     else {
       $summary[] = $this->t('Link text not trimmed');
     }
 
     if (!empty($settings['rel'])) {
-      $summary[] = $this->t('Add rel="@rel"', array('@rel' => $settings['rel']));
+      $summary[] = $this->t('Add rel="@rel"', ['@rel' => $settings['rel']]);
     }
     if (!empty($settings['target'])) {
       $summary[] = $this->t('Open link in new window');
@@ -96,7 +96,7 @@ class SoundCloudLinkFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = array();
+    $elements = [];
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
@@ -108,15 +108,15 @@ class SoundCloudLinkFormatter extends FormatterBase {
           $link_title = Unicode::truncate($link_title, $settings['trim_length'], FALSE, TRUE);
         }
 
-        $elements[$delta] = array(
+        $elements[$delta] = [
           '#type' => 'link',
           '#url' => Url::fromUri($item->url),
           '#title' => $link_title,
-          '#options' => array(),
-        );
+          '#options' => [],
+        ];
 
         if (!empty($item->_attributes)) {
-          $elements[$delta]['#options'] += array('attributes' => array());
+          $elements[$delta]['#options'] += ['attributes' => []];
           $elements[$delta]['#options']['attributes'] += $item->_attributes;
           // Unset field item attributes since they have been included in the
           // formatter output and should not be rendered in the field template.

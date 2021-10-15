@@ -2,10 +2,8 @@
 
 namespace Drupal\soundcloudfield\Plugin\Field\FieldFormatter;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**

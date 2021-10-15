@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @author Attila Fekete - http://drupal.org/user/762986
+ * Contains soundcloudfield.module.
  */
 
 define('SOUNDCLOUDFIELD_DEFAULT_WIDTH', 100);

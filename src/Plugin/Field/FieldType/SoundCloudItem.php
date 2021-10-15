@@ -35,26 +35,23 @@ class SoundCloudItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
-    return array(
-      'columns' => array(
-        'url' => array(
+    return [
+      'columns' => [
+        'url' => [
           'description' => 'The URL of the SoundCloud link.',
           'type' => 'varchar',
           'length' => 2048,
           'not null' => FALSE,
-        ),
-//        'indexes' => array(
-//          'url' => array('url'),
-//        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public function instanceSettingsForm(array $form, array &$form_state) {
-    $element = array();
+    $element = [];
 
     return $element;
   }
@@ -75,16 +72,15 @@ class SoundCloudItem extends FieldItemBase {
     $constraints = parent::getConstraints();
 
     $max_length = 512;
-    $constraints[] = $constraint_manager->create('ComplexData', array(
-      'url' => array(
-        'Length' => array(
+    $constraints[] = $constraint_manager->create('ComplexData', [
+      'url' => [
+        'Length' => [
           'max' => $max_length,
-          'maxMessage' => $this->t('%name: the SoundCloud URL may not be longer than @max characters.', array('%name' => $this->getFieldDefinition()->getLabel(), '@max' => $max_length)),
-        )
-      ),
-    ));
+          'maxMessage' => $this->t('%name: the SoundCloud URL may not be longer than @max characters.', ['%name' => $this->getFieldDefinition()->getLabel(), '@max' => $max_length]),
+        ],
+      ],
+    ]);
 
     return $constraints;
   }
-
 }
