@@ -290,6 +290,10 @@ function soundcloudfield_field_formatter_info() {
       'label' => t('Link'),
       'field types' => array('soundcloud'),
     ),
+    'soundcloud_js' => array(
+      'label'       => t('Javascript'),
+      'field types' => array('soundcloud'),
+    ),
   );
 }
 
@@ -442,11 +446,46 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
         $element[$delta] = array('#markup' => $output);
       }
       break;
+
     // Link formatter.
     case 'soundcloud_link':
       foreach ($items as $delta => $item) {
         $element[$delta] = array('#markup' => l($item['url'], $item['url']));
       }
+      break;
+
+    // Javascript formatter.
+    case 'soundcloud_js':
+      $output = '';
+      static $soundcloud_js_sdk_included;
+      if (!isset($soundcloud_js_sdk_included)) {
+        $output .= '<script src="https://connect.soundcloud.com/sdk.js"></script>';
+        $output .= '<script>SC.initialize();</script>';
+        $soundcloud_js_sdk_included = true;
+      }
+      foreach ($items as $delta => $item) {
+        $id = preg_replace('`[^A-Za-z0-9-]+`', '-', $item['url']);
+        $output .= '<div id="' . $id . '"></div>';
+        $output .= "
+<script>
+var track_url = '";
+        $output .= $item['url'];
+        $output .= "';
+SC.oEmbed(track_url, { auto_play: " . $autoplay
+                     . ", width: '" . $settings['width'] . "%'"
+                     //. ', height: ' . $settings['set_height']
+                     . ', show_artwork: ' . $showartwork
+                     . ', show_playcount: ' . $showplaycount
+                     //. ', show_comments: ' . $showcomments
+                     //. ", color: '" . $color . "'"
+                     . " }, function(oEmbed) {
+  document.getElementById('";
+        $output .= $id;
+        $output .= "').innerHTML=oEmbed.html;
+});
+</script>";
+      }
+      $element[$delta] = array('#markup' => $output);
       break;
   }
 
