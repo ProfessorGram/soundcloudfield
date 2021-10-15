@@ -146,7 +146,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
     // HTML5 (classic) player-only settings.
     $form['soundcloudplayer']['html5_player'] = array(
       '#type' => 'fieldset',
-      '#title' => t('SoundCloud HTML5 player-only settings'),
+      '#title' => t('SoundCloud HTML5 player settings'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
@@ -174,7 +174,7 @@ function soundcloudfield_field_instance_settings_form($field, $instance) {
     // Visual (new) player-only settings.
     $form['soundcloudplayer']['visual_player'] = array(
       '#type' => 'fieldset',
-      '#title' => t('SoundCloud HTML5 visual player-only settings'),
+      '#title' => t('SoundCloud HTML5 and JS visual player settings'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
@@ -457,35 +457,31 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
     // Javascript formatter.
     case 'soundcloud_js':
       $output = '';
-      static $soundcloud_js_sdk_included;
-      if (!isset($soundcloud_js_sdk_included)) {
-        $output .= '<script src="https://connect.soundcloud.com/sdk.js"></script>';
-        $output .= '<script>SC.initialize();</script>';
-        $soundcloud_js_sdk_included = true;
-      }
+      // JS uses visual player height.
+      $iframe_height = $settings['visual_player']['visual_player_height'];
+
+      $element['#attached']['js'] = array(
+        'https://connect.soundcloud.com/sdk/sdk-3.3.2.js' => array(
+          'type' => 'external',
+        ),
+        'SC.initialize();' => array(
+          'type' => 'inline',
+        ),
+      );
+
       foreach ($items as $delta => $item) {
-        $id = preg_replace('`[^A-Za-z0-9-]+`', '-', $item['url']);
-        $output .= '<div id="' . $id . '"></div>';
-        $output .= "
-<script>
-var track_url = '";
-        $output .= $item['url'];
-        $output .= "';
-SC.oEmbed(track_url, { auto_play: " . $autoplay
-                     . ", width: '" . $settings['width'] . "%'"
-                     //. ', height: ' . $settings['set_height']
-                     . ', show_artwork: ' . $showartwork
-                     . ', show_playcount: ' . $showplaycount
-                     //. ', show_comments: ' . $showcomments
-                     //. ", color: '" . $color . "'"
-                     . " }, function(oEmbed) {
-  document.getElementById('";
-        $output .= $id;
-        $output .= "').innerHTML=oEmbed.html;
-});
-</script>";
+        $id = drupal_clean_css_identifier($item['url']);
+        $element[$delta] = array(
+          '#theme' => 'soundcloudfield_js_embed',
+          '#id' => $id,
+          '#url' => $item['url'],
+          '#autoplay' => $autoplay,
+          '#maxheight' => $iframe_height,
+          '#showartwork' => $showartwork,
+          '#showplaycount' => $showplaycount,
+          '#color' => $color,
+        );
       }
-      $element[$delta] = array('#markup' => $output);
       break;
   }
 
@@ -527,4 +523,26 @@ function soundcloudfield_curl_get($url) {
   $return = curl_exec($curl);
   curl_close($curl);
   return $return;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function soundcloudfield_theme($existing, $type, $theme, $path) {
+  return array(
+    'soundcloudfield_js_embed' => array(
+      'variables' => array(
+        'id' => '',
+        'url' => '',
+        'autoplay' => 'false',
+        'maxheight' => '450px',
+        'showartwork' => 'false',
+        'showplaycount' => 'false',
+        'color' => 'ff7700',
+
+      ),
+      'template' => 'js_embed',
+      'path' => $path . '/templates',
+    ),
+  );
 }
