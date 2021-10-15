@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Plugin implementation of the 'soundcloud_url' formatter.
@@ -25,11 +26,11 @@ class SoundCloudURLFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = array();
+    $elements = [];
 
     foreach ($items as $delta => $item) {
       if (!$item->isEmpty()) {
-        $elements[$delta]['#markup'] = $item->url;
+        $elements[$delta]['#markup'] = Url::fromUri($item->url)->toString();
       }
     }
 
