@@ -107,7 +107,7 @@ class SoundCloudWidget extends WidgetBase {
   public static function validateSoundCloudUriElement($element, FormStateInterface $form_state, $form) {
     $input = $element['#value'];
 
-    if (!empty($input) && !preg_match('@^https?://soundcloud\.com/([^"\&]+)@i', $input, $matches)) {
+    if (!empty($input) && !preg_match('@^https?://?api\.?soundcloud\.com/([^"\&]+)@i', $input, $matches)) {
       $form_state->setError($element, t('Please provide a valid SoundCloud URL.'));
     }
   }
