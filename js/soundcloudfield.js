@@ -13,18 +13,26 @@
       $.each(drupalSettings.soundcloudfield, function(index, settings) {
         var trackUrl = settings.url;
         var embedSettings = {
-          auto_play: settings.autoplay,
-          maxheight: settings.maxheight,
-          show_artwork: settings.showartwork,
-          show_playcount: settings.showplaycount
+          maxheight: settings.height
         };
 
         $('#' + settings.id, context).once('soundcloudfield').each(function() {
           SC.oEmbed(trackUrl, embedSettings).then(function(oEmbed){
             var $markup = $('<div>' + oEmbed.html + '</div>');
             var $iframe = $markup.find('iframe');
-            $iframe.height(settings.maxheight + 'px');
-            $iframe.attr('src', $iframe.attr('src') + '&amp;color=%23' + settings.color);
+            $iframe.height(settings.height + 'px');
+            $iframe.width(settings.width + '%');
+            var url = new URL($iframe.attr('src'));
+            url.searchParams.set('visual', settings.visualplayer);
+            url.searchParams.set('color', settings.color);
+            url.searchParams.set('auto_play', settings.autoplay);
+            url.searchParams.set('show_comments', settings.showcomments);
+            url.searchParams.set('hide_related', settings.hiderelated);
+            url.searchParams.set('show_teaser', settings.showteaser);
+            url.searchParams.set('show_artwork', settings.showartwork);
+            url.searchParams.set('show_user', settings.showuser);
+            url.searchParams.set('show_playcount', settings.showplaycount);
+            $iframe.attr('src', url.href);
             $('#' + settings.id, context).html($markup.html());
           });
         });
