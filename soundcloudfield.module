@@ -11,3 +11,22 @@ define('SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT', 166);
 define('SOUNDCLOUDFIELD_DEFAULT_HTML5_PLAYER_HEIGHT_SETS', 450);
 // Usable sizes for visual player: 300, 450, 600.
 define('SOUNDCLOUDFIELD_DEFAULT_VISUAL_PLAYER_HEIGHT', 450);
+
+/**
+ * Implements hook_theme().
+ */
+function soundcloudfield_theme($existing, $type, $theme, $path) {
+  return [
+    'soundcloudfield_js_embed' => [
+      'variables' => [
+        'id' => '',
+        'url' => '',
+        'autoplay' => 'false',
+        'maxheight' => '450px',
+        'showartwork' => 'false',
+        'showplaycount' => 'false',
+        'color' => 'ff7700',
+      ],
+    ],
+  ];
+}

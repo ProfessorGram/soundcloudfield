@@ -19,9 +19,10 @@ use Drupal\Core\Url;
  *     "soundcloud"
  *   }
  * )
+ *
+ * @todo Investigate using extends UriLinkFormatter.
  */
 class SoundCloudLinkFormatter extends FormatterBase {
-  // @todo Investigate using extends UriLinkFormatter.
 
   /**
    * {@inheritdoc}

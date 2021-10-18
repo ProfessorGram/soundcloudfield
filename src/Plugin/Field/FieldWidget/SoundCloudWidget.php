@@ -42,7 +42,12 @@ class SoundCloudWidget extends WidgetBase {
       '#title' => $this->t('SoundCloud URL'),
       '#placeholder' => $this->getSetting('placeholder_url'),
       '#default_value' => isset($item->url) ? $item->url : NULL,
-      '#element_validate' => [[get_called_class(), 'validateSoundCloudUriElement']],
+      '#element_validate' => [
+        [
+          get_called_class(),
+          'validateSoundCloudUriElement',
+        ],
+      ],
       '#maxlength' => 2048,
       '#size' => 120,
       '#required' => $element['#required'],

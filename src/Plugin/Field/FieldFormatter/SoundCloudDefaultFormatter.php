@@ -109,8 +109,8 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
       '#type' => 'select',
       '#default_value' => $this->getSetting('soundcloud_player_type'),
       '#options' => [
-        'classic' => t('Classic'),
-        'visual' => t('Visual Player (new)'),
+        'classic' => $this->t('Classic'),
+        'visual' => $this->t('Visual Player (new)'),
       ],
     ];
 
@@ -152,9 +152,11 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
       '#size' => 4,
       '#default_value' => $this->getSetting('soundcloud_player_visual_height'),
       '#options' => [
-        300 => t('300px'),
-        450 => t('450px'),
-        600 => t('600px'),
+        300 => $this->t('300px'),
+        400 => $this->t('400px'),
+        450 => $this->t('450px'),
+        500 => $this->t('500px'),
+        600 => $this->t('600px'),
       ],
       '#states' => [
         'visible' => [

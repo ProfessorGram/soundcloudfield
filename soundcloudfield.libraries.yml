@@ -1,0 +1,17 @@
+soundcloud_sdk:
+  remote: https://developers.soundcloud.com/docs/api/sdks
+  version: 3.3.2
+  license:
+    name: MIT
+    url: https://github.com/soundcloud/soundcloud-javascript/blob/master/LICENSE.md
+    gpl-compatible: true
+  js:
+    https://connect.soundcloud.com/sdk/sdk-3.3.2.js: { type: external, minified: true }
+
+soundcloudfield_init:
+  version: 1.x
+  js:
+    js/soundcloudfield.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
