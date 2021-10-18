@@ -16,7 +16,7 @@
           auto_play: settings.autoplay,
           maxheight: settings.maxheight,
           show_artwork: settings.showartwork,
-          show_playcount: settings.showplaycount,
+          show_playcount: settings.showplaycount
         };
 
         $('#' + settings.id, context).once('soundcloudfield').each(function() {
