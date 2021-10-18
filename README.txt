@@ -43,10 +43,10 @@ SoundCloud field type will be listed under the General section.
 Once you have added the field, go to "Manage display" to select the view modes
 it should appear on. Under "Format" select the type of output. The choices are
 
- * Default (HTML5 Player): Uses a server-side request to load the embed code
+ * Default (PHP-Based): Uses a server-side request to load the embed code
    from SoundCloud.
- * Visual Player loaded via Javascript: Uses a client-side request to load the
-   embed code from SoundCloud. This doesn't support the Classic HTML5 player.
+ * Javascript: Uses a client-side request to load the embed code from
+   SoundCloud.
  * Link to SoundCloud URI: Generates a basic HTML link to SoundCloud.
  * Raw output of SoundCloud URI: Returns only the field value in plain text.
 
