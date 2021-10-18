@@ -282,7 +282,6 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
         // Parse src attribute and replace query params with our own.
         $iframe_src = $iframe->getAttribute('src');
         $url_path = UrlHelper::parse($iframe_src)['path'];
-        dpm($iframe_src);
         $iframe->setAttribute('src', $url_path . '?' . UrlHelper::buildQuery($url_params));
         $output = html_entity_decode($dom->saveHTML());
       }
