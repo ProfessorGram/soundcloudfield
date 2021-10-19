@@ -208,7 +208,7 @@ class SoundCloudJSFormatter extends FormatterBase {
       $id = Html::cleanCssIdentifier($item->url);
       $js_settings['id'] = $id;
 
-      $elements['#attached']['drupalSettings']['soundcloudfield'][] = $js_settings;
+      $elements['#attached']['drupalSettings']['soundcloudfield'][$id] = $js_settings;
 
       $elements[$delta] = [
         '#theme' => 'soundcloudfield_js_embed',
