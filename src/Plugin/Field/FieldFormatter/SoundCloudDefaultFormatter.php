@@ -271,19 +271,17 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
       if ($soundcloud_embed_data = $this->fetchSoundCloudData($oembed_url)) {
         // Load in the oEmbed JSON.
         $oembed = Json::decode($soundcloud_embed_data);
-
-        $dom = Html::load($oembed['html']);
-        $iframe = $dom->getElementsByTagName('iframe')->item(0);
+        $markup = $oembed['html'];
 
         // Replace player default player width and height.
-        $iframe->setAttribute('width', $width . '%');
-        $iframe->setAttribute('height', $height);
+        $markup = preg_replace('/(width=)"([^"]+)"/', 'width="' . $width . '%"', $markup);
+        $markup = preg_replace('/(height=)"([^"]+)"/', 'height="' . $height . '"', $markup);
 
         // Parse src attribute and replace query params with our own.
-        $iframe_src = $iframe->getAttribute('src');
-        $url_path = UrlHelper::parse($iframe_src)['path'];
-        $iframe->setAttribute('src', $url_path . '?' . UrlHelper::buildQuery($url_params));
-        $output = html_entity_decode($dom->saveHTML());
+        preg_match('/src="([^"]+)"/', $markup, $match);
+        $iframe_src_parts = explode('?', $match[1]);
+        $markup = str_replace($match[1], url($iframe_src_parts[0], array('query' => $url_params)), $markup);
+        $output = $markup;
       }
       else {
         $soundcloud_url = Url::fromUri($item->url)->toString();
