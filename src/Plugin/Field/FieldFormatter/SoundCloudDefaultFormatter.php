@@ -280,7 +280,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
         // Parse src attribute and replace query params with our own.
         preg_match('/src="([^"]+)"/', $markup, $match);
         $iframe_src_parts = explode('?', $match[1]);
-        $markup = str_replace($match[1], url($iframe_src_parts[0], array('query' => $url_params)), $markup);
+        $markup = str_replace($match[1], Url::fromUri($iframe_src_parts[0], array('query' => $url_params))->toString(), $markup);
         $output = $markup;
       }
       else {
