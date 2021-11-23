@@ -92,6 +92,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
       'soundcloud_player_autoplay' => '',
       'soundcloud_player_color' => 'ff7700',
       'soundcloud_player_hiderelated' => '',
+      'soundcloud_player_showteaser' => TRUE,
       'soundcloud_player_showartwork' => '',
       'soundcloud_player_showcomments' => TRUE,
       'soundcloud_player_showplaycount' => '',
@@ -261,7 +262,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
       else {
         $parsed_url = parse_url($item->url);
         $split_path = explode('/', $parsed_url['path']);
-        $height = (!isset($split_path[2]) || $split_path[2] == 'sets') ? $settings['soundcloud_player_height_sets'] : $settings['soundcloud_player_classic_height'];
+        $height = (!isset($split_path[2]) || $split_path[2] == 'sets') ? $settings['soundcloud_player_height_sets'] : $settings['soundcloud_player_height'];
       }
 
       // Create the URL.
