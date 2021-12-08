@@ -254,7 +254,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
     foreach ($items as $delta => $item) {
       $output = '';
       $encoded_url = urlencode($item->url);
-      $url_params['url'] = $encoded_url;
+      $url_params['url'] = $item->url;
 
       if ($settings['soundcloud_player_type'] == 'visual') {
         $height = $settings['soundcloud_player_visual_height'];
