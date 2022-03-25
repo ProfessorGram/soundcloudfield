@@ -22,6 +22,9 @@
             var $iframe = $markup.find('iframe');
             $iframe.height(settings.height + 'px');
             $iframe.width(settings.width + '%');
+            if (typeof $iframe.attr('title') === 'undefined') {
+              $iframe.attr('title', oEmbed.title);
+            }             
             var url = new URL($iframe.attr('src'));
             url.searchParams.set('visual', settings.visualplayer);
             url.searchParams.set('color', settings.color);
