@@ -439,11 +439,11 @@ function soundcloudfield_field_formatter_view($entity_type, $entity, $field, $in
         // Create the URL.
         $oembed_url = $oembed_endpoint . '?iframe=true&format=json&url=' . ($encoded_url);
 
-        $soundcloud_curl_get = soundcloudfield_curl_get($oembed_url);
+        $soundcloud_request = soundcloudfield_request($oembed_url);
 
-        if ($soundcloud_curl_get != ' ') {
+        if ($soundcloud_request != ' ') {
           // Load in the oEmbed JSON.
-          $oembed = drupal_json_decode($soundcloud_curl_get);
+          $oembed = drupal_json_decode($soundcloud_request);
           $markup = $oembed['html'];
 
           // Replace player default player width and height.
@@ -537,29 +537,17 @@ function soundcloudfield_field_widget_error($element, $error) {
 }
 
 /**
- * Curl helper function.
+ * Request data from Soundcloud.
  */
-function soundcloudfield_curl_get($url) {
-  $curl = curl_init($url);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+function soundcloudfield_request($url) {
+  $response = drupal_http_request($url);
 
-  // Check the Drupal proxy server settings, see if they are correct.
-  if (variable_get('proxy_server', FALSE)) {
-    curl_setopt($curl, CURLOPT_PROXY, variable_get('proxy_server'));
-    curl_setopt($curl, CURLOPT_PROXYPORT, variable_get('proxy_port', '8080'));
-
-    if (variable_get('proxy_username', FALSE) && variable_get('proxy_password', FALSE)) {
-      curl_setopt($curl, CURLOPT_PROXYUSERPWD, variable_get('proxy_username') . ':' . variable_get('proxy_password'));
-    }
+  if ($response->code == 200) {
+    return $response->data;
   }
-
-  if (variable_get('soundcloudfield_curl_followlocation', FALSE)) {
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+  else {
+    return FALSE;
   }
-  $return = curl_exec($curl);
-  curl_close($curl);
-  return $return;
 }
 
 /**
