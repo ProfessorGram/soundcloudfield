@@ -1,4 +1,4 @@
-(function ($, Drupal, SC, drupalSettings) {
+(function ($, Drupal, SC, drupalSettings, once) {
 
   var initialized;
 
@@ -16,7 +16,7 @@
           maxheight: settings.height
         };
 
-        $('#' + settings.id, context).once('soundcloudfield').each(function() {
+        $(once('Soundcloud', '#' + settings.id, context)).each(function () {
           SC.oEmbed(trackUrl, embedSettings).then(function(oEmbed){
             var $markup = $('<div>' + oEmbed.html + '</div>');
             var $iframe = $markup.find('iframe');
@@ -24,7 +24,7 @@
             $iframe.width(settings.width + '%');
             if (typeof $iframe.attr('title') === 'undefined') {
               $iframe.attr('title', oEmbed.title);
-            }             
+            }
             var url = new URL($iframe.attr('src'));
             url.searchParams.set('visual', settings.visualplayer);
             url.searchParams.set('color', settings.color);
@@ -43,4 +43,4 @@
     }
   };
 
-})(jQuery, Drupal, SC, drupalSettings);
+})(jQuery, Drupal, SC, drupalSettings, once);
