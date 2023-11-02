@@ -1,0 +1,13 @@
+{
+  "name": "drupal/soundcloudfield",
+  "type": "drupal-module",
+  "description": "soundcloudfield",
+  "keywords": ["Drupal"],
+  "homepage": "http://drupal.org/project/soundcloudfield",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "http://drupal.org/project/issues/soundcloudfield",
+    "source": "http://cgit.drupalcode.org/soundcloudfield"
+  },
+  "require": { }
+}

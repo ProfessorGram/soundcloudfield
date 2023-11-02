@@ -276,7 +276,7 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
         // Set title for accessibility, if not already set.
         if (!preg_match('/(title=)"([^"]+)"/', $markup)) {
           $markup = preg_replace('/(<iframe\b[^><]*)>/i', '$1 title="' . Html::escape($oembed['title']) . '">', $markup);
-       }
+        }
 
         // Replace player default player width and height.
         $markup = preg_replace('/(width=)"([^"]+)"/', 'width="' . $width . '%"', $markup);
@@ -324,4 +324,5 @@ class SoundCloudDefaultFormatter extends FormatterBase implements ContainerFacto
 
     return $data;
   }
+
 }
