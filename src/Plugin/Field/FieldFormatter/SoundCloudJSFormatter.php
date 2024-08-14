@@ -53,7 +53,7 @@ class SoundCloudJSFormatter extends FormatterBase {
       '#title' => $this->t('Player type'),
       '#description' => $this->t('Select either Visual or Classic player.'),
       '#type' => 'select',
-      '#default_value' => $settings['soundcloud_visual_player'],
+      '#default_value' => $settings['soundcloud_player_type'],
       '#options' => [
         'visual' => $this->t('Visual Player'),
         'classic' => $this->t('Classic'),
